@@ -6,7 +6,7 @@ var expect = require('chai').expect;
 describe('cairn', function () {
   let styles,
       sheet,
-      thingOne = { fontSize: 10 }, 
+      thingOne = { fontSize: 10 },
       thingTwo = { fontSize: 20 },
       parent = { fontSize: 30 },
       child = { fontSize: 40 },
