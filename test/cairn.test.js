@@ -1,6 +1,6 @@
 'use strict';
 
-let cairn = require('../index.js');
+let cairn = require('../lib');
 var expect = require('chai').expect;
 
 describe('cairn', function () {

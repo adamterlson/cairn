@@ -2,7 +2,7 @@
   "name": "cairn",
   "version": "0.0.1",
   "description": "A string-based selector engine for React Native styling",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
     "test": "./node_modules/mocha/bin/mocha"
   },
