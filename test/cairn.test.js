@@ -111,9 +111,5 @@ describe('cairn', function () {
     it('should not apply selectors after an invalid one', function () {
       expect(styles('parent.child.invalid.grandchild')).to.eql([parent, child]);
     });
-
-    it('should throw when not doing simple conditional selectors and a key is omitted', function () {
-      expect(styles('thingOne?one thingTwo?two parent?', { one: true, two: false }))
-    });
   });
 });

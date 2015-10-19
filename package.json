@@ -2,8 +2,10 @@
   "name": "cairn",
   "version": "0.0.1",
   "description": "A string-based selector engine for React Native styling",
-  "main": "lib/index.js",
+  "main": "dest/index.js",
   "scripts": {
+    "compile": "babel -d dest/ lib/",
+    "prepublish": "npm run compile",
     "test": "./node_modules/mocha/bin/mocha"
   },
   "repository": {
