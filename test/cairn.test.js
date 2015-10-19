@@ -56,6 +56,32 @@ describe('cairn', function () {
     it('should toggle multiple selectors', function () {
       expect(styles('thingOne thingTwo? thingTwo? parent?', false)).to.eql([thingOne]);
     });
+
+    describe('selector hash', function () {
+      it('should use the class name as a default key in the toggle hash', function () {
+        expect(styles('thingOne?', { thingOne: false })).to.eql([]);
+        expect(styles('thingOne?', { thingOne: true })).to.eql([thingOne]);
+        expect(styles('thingOne? thingTwo?', { thingOne: true })).to.eql([thingOne]);
+      });
+
+      describe('renamed keys', function () {
+        it('should toggle off based on the value of a specific hash', function () {
+          expect(styles('thingOne?one', { one: false })).to.eql([]);
+        });
+        it('should toggle on based on the value of a specific hash', function () {
+          expect(styles('thingOne?one thingTwo?two parent?parent', { one: true, two: false, parent: true })).to.eql([thingOne, parent]);
+        });
+        it('should blend renamed and default keys', function () {
+          expect(styles('thingOne?one thingTwo? parent?', { one: true, thingTwo: true })).to.eql([thingOne, thingTwo]);
+        });
+        it('should rename dot notation syntax on', function () {
+          expect(styles('parent.child.grandchild?newname', { newname: true })).to.eql([parent, child, grandchild]);
+        });
+        it('should rename dot notation syntax off', function () {
+          expect(styles('parent.child.grandchild?newname', { newname: false })).to.eql([]);
+        });
+      });
+    });
   });
 
   describe('dot notation syntax', function () {
@@ -84,6 +110,10 @@ describe('cairn', function () {
 
     it('should not apply selectors after an invalid one', function () {
       expect(styles('parent.child.invalid.grandchild')).to.eql([parent, child]);
+    });
+
+    it('should throw when not doing simple conditional selectors and a key is omitted', function () {
+      expect(styles('thingOne?one thingTwo?two parent?', { one: true, two: false }))
     });
   });
 });

@@ -62,7 +62,8 @@ class MyView extends React.Component {
 The former results in all the following classes being applied: `header`, `header.user`, `header.user.admin`.
 
 
-###Optional selector syntax: `styles('foo bar? baz', truthy/falsy)`
+###Conditional selectors
+####`styles('foo bar? baz?', true/false)`
 Append on conditional classes with the a `?` flag and pass the toggle state as a secondary parameter.  Styles lacking the conditional flag are always active.
 
 ````javascript
@@ -81,6 +82,33 @@ class MyView extends React.Component {
     let isActive = true;
     return (
       <Text styles={styles('p active?', isActive)}>Are you active?</Text>
+    );
+  }
+}
+````
+
+####`styles('bar?newName baz?', { newName: true, baz: false })`
+Specify a hash and the value of the classname's property will be used as the toggle state of that class.  Rename the property by giving the name after the `?` in the selector.
+
+````javascript
+let sheet = StyleSheet.create({
+  'p': {
+    fontSize: 30
+  },
+  'active': {
+    fontSize: 20
+  },
+  'blue': {
+    color: 'blue'
+  }
+});
+let styles = cairn(styles);
+
+class MyView extends React.Component {
+  render() {
+    let state = { isActive: true, blue: false };
+    return (
+      <Text styles={styles('p active?isActive blue?', state)}>Are you active and blue?</Text>
     );
   }
 }

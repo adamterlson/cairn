@@ -3,18 +3,14 @@ export default function (styles) {
     let parts = query.split(' ');
     return parts
       .reduce((arr, selector) => {
-        // Handle conditional selectors
-        if (selector[selector.length-1] === '?') {
-          // Toggling off conditional selectors, so skip this one
-          if (!toggle) return arr;
+        // Add conditional selector support
+        selector = conditionalSelector(selector, toggle);
 
-          // Toggling on conditional selectors, so remove the '?'
-          selector = selector.slice(0, -1);
-        }
+        if (!selector) return arr;
 
         // Expand out dot notation syntax
         arr = arr.concat(dotExpander(selector));
-        
+
         return arr;
       }, [])
       .map(part => {
@@ -27,6 +23,26 @@ export default function (styles) {
       .filter(style => style);
   };
 };
+
+function conditionalSelector(selector, toggle) {
+  let usingToggleHash = toggle != null && Object.keys(toggle).length !== 0;
+  let selectorParts = selector.split('?');
+
+  // The selector is conditional
+  if (selectorParts.length > 1) {
+    let toggleHashKey = selectorParts[1] || selectorParts[0];
+
+    if (!usingToggleHash) {
+      // Toggling all conditional selectors
+      if (!toggle) return;
+    } else {
+      // Toggleing based on a specific hash key
+      if (!toggle[toggleHashKey]) return;
+    }
+  }
+
+  return selectorParts[0];
+}
 
 // Expand out the individual selector components based on form
 function selectorReducer(arr, selector) {
