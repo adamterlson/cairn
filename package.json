@@ -1,7 +1,7 @@
 {
   "name": "cairn",
-  "version": "0.0.1",
-  "description": "A string-based selector engine for React Native styling",
+  "version": "0.1.0",
+  "description": "Simpler string-based styling for React Native",
   "main": "dest/index.js",
   "scripts": {
     "compile": "babel -d dest/ lib/",
