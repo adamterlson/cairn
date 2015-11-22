@@ -149,7 +149,7 @@ It may be necessary (such as with animations) to apply inline styles. Include an
 
 
 ##`cairn.pile({})`
-To construct your stylesheet with dot notation via nesting objects, call `pile`.
+Construct your stylesheet with dot notation via nesting objects.
 
 ````javascript
 let React = require('react-native');
