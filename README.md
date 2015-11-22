@@ -1,5 +1,65 @@
 # Cairn
-Cairn is a tiny library for React Native that replaces the default `styles={[styles.foo, styles.bar]}` styling sytnax with a simpler string-based syntax that supports defining multiple classes, applying heirarchically-defined classes en masse (i.e. simple cascading), and easy toggling of conditional classes.
+Cairn is a tiny library for React Native that replaces the default `styles={[styles.foo, styles.bar]}` styling sytnax with a simpler string-based syntax: `styles={styles('foo bar')}`.  Cairn supports defining multiple classes, applying heirarchically-defined classes en masse (i.e. simple cascading), and conditional classes.
+
+###Background
+
+In React Native, there is no cascading of styles, so when you have multiple types of something, say a pageContainer, you may initially be tempted to style each individually:
+
+````javascript
+{
+  'pageContainer': {
+    flex: 1,
+    marginTop: 10,
+    marginBottom: 10
+  },
+  'pageContainerWithHeader': {
+    flex: 1,
+    marginTop: 20
+  },
+  'pageContainerWithFooter': {
+    flex: 1,
+    marginBottom: 20
+  },
+  'pageContainerWithHeaderAndFooter': {
+    flex: 1,
+    marginTop: 20,
+    marginBottom: 20
+  }
+}
+....
+<View styles={styles.pageContainerWithHeaderAndFooter}>Body Text</View>
+````
+
+This can be improved upon by extracting out the common bits into their own classes and styling your element via an array:
+
+````
+{
+  'pageContainer': {
+    flex: 1,
+    marginTop: 10,
+    marginBottom: 10
+  },
+  'pageContainerWithHeader': {
+    marginTop: 20
+  },
+  'pageContainerWithFooter': {
+    marginBottom: 20
+  }
+}
+....
+<View styles={[
+  styles.pageContainer, 
+  styles.pageContainerWithHeader, 
+  styles.pageContainerWithFooter ]}>
+  Body Text
+</View>
+````
+
+This is better, there's less redundancy in the styles, but the length of the class array can very quickly get out of hand when each bit of style is separated.  Additionally, there is a redundancy of "pageContainer" in the stylesheet.  What we need is a way to get the best of both worlds:
+
+1) Be able to separate our stylesheet out into a set of parent types and child types that extend their parents, and
+
+2) Reference this child type directly and get all the parent styling for free without having to compose it manually
 
 ###Basic Usage 
 ####`styles('foo bar baz')`
@@ -20,7 +80,7 @@ let sheet = StyleSheet.create({
     fontStyle: 'italic'
   }
 });
-let styles = cairn(sheet);
+let styles = cairn.style(sheet);
 
 class MyView extends React.Component {
   render() {
@@ -32,7 +92,131 @@ class MyView extends React.Component {
 }
 ````
 
-###Only Slightly Less Basic Usage
+###`styles('foo.bar.baz')`
+Set up your stylesheet with parent-child relationships annotated via dot notation.  Then, use `cairn.styles` to expand a reference made directly to a child (e.g. `header.h1.user`) to contain references to every parent as well (`header, header.h1, header.h1.user`).
+
+````javascript
+let sheet = StyleSheet.create({
+  'header': {
+    fontFamily: 'Georgia',
+    textDecorationLine: 'underline'
+  },
+  'header.h1': {
+    fontSize: 30
+  },
+  'header.h1.user': {
+    color: 'red'
+  },
+  'header.h2': {
+    fontSize: 20
+  },
+  'text': {
+    fontFamily: 'Cochin',
+    color: '#222'
+  },
+  'text.p': {
+    marginBottom: 10
+  }
+});
+let styles = cairn.style(sheet);
+
+class MyView extends React.Component {
+  render() {
+    return (
+      <!-- header, header.h1, header.h1.user -->
+      <Text styles={styles('header.h1.user')}>Primary Header Text</Text>
+      <!-- header, header.h2 -->
+      <Text styles={styles('header.h2')}>Secondary Header Text</Text>
+      <!-- text, text.p -->
+      <Text styles={styles('text.p')}>Body Text</Text>
+    );
+  }
+}
+````
+
+##`cairn.pile([name ,] {})`
+An alternative to the above, manual method of constructing your stylesheet with dot notation is available, by nesting the objects instead and calling `pile`.
+
+Provide an optional name to the pile and all classes will be prefixed with that name.
+
+````javascript
+let React = require('react-native');
+let cairn = require('cairn');
+let { Text, View, StyleSheet } = React;
+
+let pile = cairn.pile({
+  header: {
+    fontFamily: 'Georgia',
+    textDecorationLine: 'underline',
+
+    h1: {
+      fontSize: 30,
+
+      user: {
+        color: 'red'
+      }
+    },
+
+    h2: {
+      fontSize: 20
+    }
+  }
+  text: {
+    fontFamily: 'Cochin',
+    color: '#222',
+
+    p: {
+      marginBottom: 10
+    }
+  }
+});
+let sheet = StyleSheet.create(pile);
+let styles = cairn.style(sheet);
+
+class MyView extends React.Component {
+  render() {
+    return (
+      <!-- header, header.h1, header.h1.user -->
+      <Text styles={styles('header.h1.user')}>Primary Header Text</Text>
+      <!-- header, header.h2 -->
+      <Text styles={styles('header.h2')}>Secondary Header Text</Text>
+      <!-- text, text.p -->
+      <Text styles={styles('text.p')}>Body Text</Text>
+    );
+  }
+}
+````
+
+If your stylesheet gets large enough, you may want to separate it out into multiple files:
+
+````javascript
+let React = require('react-native');
+let cairn = require('cairn');
+let { StyleSheet } = React;
+
+// Do not pile any of these, just return objects
+let headlines = require('./headlines');
+let links = require('./links');
+let paragraphs = require('./paragraphs');
+let buttons = require('./buttons');
+let panels = require('./panels');
+
+let sheet = {
+  text: {
+    // Applies to all child types of text
+    fontFamily: 'Helvetica',
+
+    headlines,
+    links,
+    paragraphs
+  },
+  buttons,
+  panels
+};
+
+module.exports = StyleSheet.create(cairn.pile(sheet));
+
+````
 
 ####Conditional classes
 #####`styles('foo bar? baz?', true/false)`
@@ -85,49 +269,6 @@ class MyView extends React.Component {
   }
 }
 ````
-
-####Cascading styles: `styles('foo.bar.baz')`
-The namesake of Cairn.  For organization and reusability, it might be helpful to use a dot notation to denote class heirarchies in your stylesheet definitions (e.g. `pageContainer.withHeader`).  Defining your styles in this way in your stylesheet, then using the matching dot notation in the call to `style`, will result in the styles of all the parent types being applied en masse.  
-
-This can make organization of your stylesheets dramatically cleaner and reduce redundancy.  The application of the style heirachy also becomes a breeze by simply having to define the element as being a `child` of `parent` and getting all the `parent`'s styles for free.
-
-In the future, Cairn may be updated to generate these heirarchies for you to prevent the repetition in the class labels.  For now:
-
-````javascript
-let sheet = StyleSheet.create({
-  'header': {
-    fontFamily: 'Georgia',
-    textDecorationLine: 'underline'
-  },
-  'header.h1': {
-    fontSize: 30,
-    color: 'blue'
-  },
-  'header.h1.user': {
-    color: 'red'
-  },
-  'text': {
-    fontFamily: 'Cochin',
-    color: '#222'
-  },
-  'text.p': {
-    marginBottom: 10
-  }
-});
-let styles = cairn(sheet);
-class MyView extends React.Component {
-  render() {
-    return (
-      <!-- header, header.h1, header.h1.user -->
-      <Text styles={styles('header.h1.user')}>Header Text</Text>
-      <!-- text, text.p -->
-      <Text styles={styles('text.p')}>Body Text</Text>
-    );
-  }
-}
-````
-
-**Note:** `styles('header.h1.user?', false)` will toggle the entire statement, not just the `user` portion of it, resulting in no applied styles.  If you want to use conditional styles in the heirachy, separate the conditional from the non-conditional: `styles('header.h1 header.h1.user?', false)`.
 
 
 ####What does it stand for?

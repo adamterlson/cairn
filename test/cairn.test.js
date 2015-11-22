@@ -144,7 +144,7 @@ describe('cairn', function () {
       };
     });
 
-    it('should pile', function () {
+    it('should pile with a name prefix', function () {
       expect(pile('foo', sheet)).to.eql({
         'foo.uncle': {
           fontSize: 10
@@ -162,6 +162,29 @@ describe('cairn', function () {
           color: 'blue'
         },
         'foo.parent.child.grandchild': {
+          flex: 1
+        }
+      })
+    });
+
+    it('should pile without a name prefix', function () {
+      expect(pile(sheet)).to.eql({
+        'uncle': {
+          fontSize: 10
+        },
+        'aunt': {
+          fontSize: 20
+        },
+        'aunt.cousin': {
+          color: 'red'
+        },
+        'parent': {
+          fontSize: 30
+        },
+        'parent.child': {
+          color: 'blue'
+        },
+        'parent.child.grandchild': {
           flex: 1
         }
       })
