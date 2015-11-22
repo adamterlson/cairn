@@ -1,5 +1,7 @@
 # Cairn
-Cairn is a tiny library for React Native that replaces the default `styles={[styles.foo, styles.bar]}` styling sytnax with a simpler string-based spread syntax: `{...styles('foo bar')}`.  Cairn supports defining multiple classes, applying heirarchically-defined classes en masse (i.e. simple cascading), and conditional classes.
+Cairn is a tiny library for React Native that replaces the default `styles={[styles.foo, styles.bar]}` styling sytnax with a simpler string-based spread syntax: `{...style('foo bar')}`.  Cairn supports defining multiple classes, applying heirarchically-defined classes en masse, and conditional classes.
+
+If you're not sure why you want this, check out the [Background](#background) section.
 
 ##Install
 ```
@@ -7,16 +9,16 @@ npm install --save cairn
 ```
 
 ###Basic Usage
-####`let styles = cairn.style(sheet[, options])`
+####`let style = cairn.style(sheet[, options])`
 Pass to `cairn.style` your React Native Stylesheet or object containing styles and use the returned function to apply the styles to elements.
 
 **Available Options**
 
-`spread` (default: true): Enable/disable spread syntax. If false, use `style={styles('foo')}`.
+`spread` (default: true): Enable/disable spread syntax. If false, use `style={style('foo')}`.
 
 
 ####Apply multiple styles
-#####`...styles('foo bar baz')`
+#####`...style('foo bar baz')`
 Apply multiple independent classes by passing a space-delimited string.  Classes are appended in order with last item having precedence.  Invalid class names will be ignored with a warning.
 
 ```javascript
@@ -34,20 +36,20 @@ let sheet = StyleSheet.create({
     fontStyle: 'italic'
   }
 });
-let styles = cairn.style(sheet);
+let style = cairn.style(sheet);
 
 class MyView extends React.Component {
   render() {
     return (
-      <Text {...styles('h1')}>Main Heading</Text>
-      <Text {...styles('h2 italic')}>Secondary Heading</Text>
+      <Text {...style('h1')}>Main Heading</Text>
+      <Text {...style('h2 italic')}>Secondary Heading</Text>
     );
   }
 }
 ````
 
 ####Apply heirarchy of styles
-#####`...styles('foo.bar.baz')`
+#####`...style('foo.bar.baz')`
 Set up your stylesheet with parent-child relationships annotated via dot notation.  Then, use cairn to expand a child reference (e.g. `header.h1.user`) to include parents as well (`header, header.h1, header.h1.user`).
 
 ````javascript
@@ -73,24 +75,24 @@ let sheet = StyleSheet.create({
     marginBottom: 10
   }
 });
-let styles = cairn.style(sheet);
+let style = cairn.style(sheet);
 
 class MyView extends React.Component {
   render() {
     return (
       <!-- header, header.h1, header.h1.user -->
-      <Text {...styles('header.h1.user')}>Primary Header Text</Text>
+      <Text {...style('header.h1.user')}>Primary Header Text</Text>
       <!-- header, header.h2 -->
-      <Text {...styles('header.h2')}>Secondary Header Text</Text>
+      <Text {...style('header.h2')}>Secondary Header Text</Text>
       <!-- text, text.p -->
-      <Text {...styles('text.p')}>Body Text</Text>
+      <Text {...style('text.p')}>Body Text</Text>
     );
   }
 }
 ````
 
 ####Conditional styles
-#####`styles('foo bar? baz?', true/false)`
+#####`style('foo bar? baz?', true/false)`
 Append on conditional classes with the `?` flag and pass the toggle state as a the second parameter.  Styles lacking the conditional flag are always applied.
 
 ````javascript
@@ -102,19 +104,19 @@ let sheet = StyleSheet.create({
     fontSize: 20
   }
 });
-let styles = cairn(sheet);
+let style = cairn(sheet);
 
 class MyView extends React.Component {
   render() {
     let isActive = true;
     return (
-      <Text {...styles('p active?', isActive)}>Always a P, not always active</Text>
+      <Text {...style('p active?', isActive)}>Always a P, not always active</Text>
     );
   }
 }
 ````
 
-#####`styles('bar? baz?newName', { bar: true, newName: false })`
+#####`style('bar? baz?newName', { bar: truthy, newName: falsey })`
 Provide a hash as a second parameter and the value of the classname's corresponding property will be used as the toggle state of that class.  Specify a different property to use by specifying the property name after the `?`.
 
 ````javascript
@@ -122,21 +124,17 @@ let sheet = StyleSheet.create({
   'p': {
     fontSize: 30
   },
-  'active': {
-    fontSize: 20
-  },
-  'blue': {
+  'error': {
     color: 'blue'
   }
 });
-let styles = cairn(sheet);
+let style = cairn(sheet);
 
 class MyView extends React.Component {
   render() {
-    let state = { isActive: true, blue: false };
     return (
-      <Text {...styles('p blue? active?isActive', state)}>
-        Are you active and blue?
+      <Text {...style('p error?name', this.props)}>
+        { this.props.name ? 'Thanks!' : 'Please enter your name.' }
       </Text>
     );
   }
@@ -144,7 +142,7 @@ class MyView extends React.Component {
 ````
 
 ####Inline styles
-#####`styles('foo', [{ color: 'red' }])`
+#####`style('foo', [{ color: 'red' }])`
 It may be necessary (such as with animations) to apply inline styles. Include an array of additional style objects to apply as the last parameter to `style`.  
 
 
@@ -183,17 +181,17 @@ let pile = cairn.pile({
   }
 });
 let sheet = StyleSheet.create(pile);
-let styles = cairn.style(sheet);
+let style = cairn.style(sheet);
 
 class MyView extends React.Component {
   render() {
     return (
       <!-- header, header.h1, header.h1.user -->
-      <Text {...styles('header.h1.user')}>Primary Header Text</Text>
+      <Text {...style('header.h1.user')}>Primary Header Text</Text>
       <!-- header, header.h2 -->
-      <Text {...styles('header.h2')}>Secondary Header Text</Text>
+      <Text {...style('header.h2')}>Secondary Header Text</Text>
       <!-- text, text.p -->
-      <Text {...styles('text.p')}>Body Text</Text>
+      <Text {...style('text.p')}>Body Text</Text>
     );
   }
 }
@@ -232,7 +230,7 @@ module.exports = StyleSheet.create(cairn.pile(sheet));
 
 ##Background
 
-In React Native, there is no cascading of styles, so when you have multiple types of something, say a pageContainer, you may initially be tempted to style each individually:
+In React Native, there is no cascading of styles, so when you have multiple types of something, say a pageContainer, most will begin by styling each individually:
 
 ````javascript
 {
@@ -256,10 +254,10 @@ In React Native, there is no cascading of styles, so when you have multiple type
   }
 }
 ....
-<View styles={styles.pageContainerWithHeaderAndFooter}>Body Text</View>
+<View style={styles.pageContainerWithHeaderAndFooter}>Body Text</View>
 ````
 
-This can be improved upon by extracting out the common bits into their own classes and styling your element via an array:
+This can be improved upon by extracting out the common bits into their own classes and using an array of styles to apply instead:
 
 ````
 {
@@ -276,7 +274,7 @@ This can be improved upon by extracting out the common bits into their own class
   }
 }
 ....
-<View styles={[
+<View style={[
   styles.pageContainer, 
   styles.pageContainerWithHeader, 
   styles.pageContainerWithFooter ]}>
@@ -290,5 +288,11 @@ This is better, there's less redundancy in the styles, but the length of the cla
 
 2) Reference this child type directly and get all the parent styling for free without having to compose it manually
 
-####What does it stand for?
-**Ca**scading **I**n **R**eact **N**ative.  Maybe.
+###Case Study
+Imagine you want to change the font family for all text in your entire application within React Native.  This means you need to give a style attribute to every `<Text>` tag, and if you have multiple kinds of text elements, you must repeat your `fontFamily: 'MyFont'` line in every type of text's class, or apply multiple multiple to every text element.  Redundancy in your styles or an unweildy array of styles on every text element in your views.  
+
+Pick your evil.
+
+Now, you want to change the font family for a type of text element, say headers.  You must update every class in your stylesheet (i.e. change every `fontFamily` line on header types) or add ANOTHER class in every component (i.e. change the name of class being used or add an additional class to every `text` element). 
+
+With Cairn, you could instead define a top level `text` namespace, define the defaults there that apply to all text elements, have subtypes for your more specific types like `text.body` or `text.headers` which can have their own children.  Then, changing the font style later for all text or all headers is easy: just change one line in the stylesheet and all the children's styles will be updated because they extend from it.
