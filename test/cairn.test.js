@@ -22,11 +22,18 @@ describe('cairn', function () {
       'parent.child.grandchild': grandchild
     };
 
-    styles = cairn.style(sheet);
+    styles = cairn.style(sheet, { spread: false });
     pile = cairn.pile;
   });
 
   describe('style', function () {
+    describe('spread syntax support', function () {
+      it('should default to spread syntax', function () {
+        styles = cairn.style(sheet);
+        expect(styles('thingOne')).to.eql({ style: [sheet.thingOne]});
+      });
+    });
+
     it('should select the appropriate styles for a single selector', function () {
       expect(styles('thingOne')).to.eql([sheet.thingOne]);
     });
@@ -139,6 +146,11 @@ describe('cairn', function () {
             grandchild: {
               flex: 1
             }
+          },
+
+          problemChild: {
+            transform: [{ scale: 1 }],
+            shadowOffset: { height: 1, width: 0 } 
           }
         }
       };
@@ -163,6 +175,10 @@ describe('cairn', function () {
         },
         'foo.parent.child.grandchild': {
           flex: 1
+        },
+        'foo.parent.problemChild': {
+          transform: [{ scale: 1 }],
+          shadowOffset: { height: 1, width: 0 } 
         }
       })
     });
@@ -186,6 +202,10 @@ describe('cairn', function () {
         },
         'parent.child.grandchild': {
           flex: 1
+        },
+        'parent.problemChild': {
+          transform: [{ scale: 1 }],
+          shadowOffset: { height: 1, width: 0 } 
         }
       })
     });

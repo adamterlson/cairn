@@ -1,6 +1,11 @@
 # Cairn
 Cairn is a tiny library for React Native that replaces the default `styles={[styles.foo, styles.bar]}` styling sytnax with a simpler string-based syntax: `styles={styles('foo bar')}`.  Cairn supports defining multiple classes, applying heirarchically-defined classes en masse (i.e. simple cascading), and conditional classes.
 
+##Install
+```
+npm install --save cairn
+```
+
 ###Background
 
 In React Native, there is no cascading of styles, so when you have multiple types of something, say a pageContainer, you may initially be tempted to style each individually:
@@ -61,7 +66,13 @@ This is better, there's less redundancy in the styles, but the length of the cla
 
 2) Reference this child type directly and get all the parent styling for free without having to compose it manually
 
-###Basic Usage 
+###Basic Usage
+####Sheet Creation: `styles = cairn.style(sheet[, options])`
+Pass to `cairn.style` your React Native Stylesheet object and use the returned function to apply the styles to elements.
+
+**Available Options**
+`spread` (default: true): Disable spread syntax (`style={styles('foo')}` instead of `...styles('foo')`).
+
 ####`styles('foo bar baz')`
 Apply multiple classes by passing a space-delimited string.  Classes are appended in order with last item having precedence.  Invalid class names will be ignored with a warning.
 
@@ -85,8 +96,8 @@ let styles = cairn.style(sheet);
 class MyView extends React.Component {
   render() {
     return (
-      <Text styles={styles('h1')}>Main Heading</Text>
-      <Text styles={styles('h2 italic')}>Secondary Heading</Text>
+      <Text ...styles('h1')>Main Heading</Text>
+      <Text ...styles('h2 italic')>Secondary Heading</Text>
     );
   }
 }
