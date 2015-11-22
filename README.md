@@ -1,5 +1,5 @@
 # Cairn
-Cairn is a tiny library for React Native that replaces the default `styles={[styles.foo, styles.bar]}` styling sytnax with a simpler string-based syntax: `styles={styles('foo bar')}`.  Cairn supports defining multiple classes, applying heirarchically-defined classes en masse (i.e. simple cascading), and conditional classes.
+Cairn is a tiny library for React Native that replaces the default `styles={[styles.foo, styles.bar]}` styling sytnax with a simpler string-based spread syntax: `{...styles('foo bar')}`.  Cairn supports defining multiple classes, applying heirarchically-defined classes en masse (i.e. simple cascading), and conditional classes.
 
 ##Install
 ```
@@ -67,14 +67,15 @@ This is better, there's less redundancy in the styles, but the length of the cla
 2) Reference this child type directly and get all the parent styling for free without having to compose it manually
 
 ###Basic Usage
-####Sheet Creation: `styles = cairn.style(sheet[, options])`
+####First, call .style: `let styles = cairn.style(sheet[, options])`
 Pass to `cairn.style` your React Native Stylesheet object and use the returned function to apply the styles to elements.
 
 **Available Options**
-`spread` (default: true): Disable spread syntax (`style={styles('foo')}` instead of `...styles('foo')`).
 
-####`styles('foo bar baz')`
-Apply multiple classes by passing a space-delimited string.  Classes are appended in order with last item having precedence.  Invalid class names will be ignored with a warning.
+`spread` (default: true): Enable/disable spread syntax. If false, use `style={styles('foo')}` instead.
+
+####Styling Type 1: `styles('foo bar baz')`
+Apply multiple independent classes by passing a space-delimited string.  Classes are appended in order with last item having precedence.  Invalid class names will be ignored with a warning.
 
 ```javascript
 let React = require('react-native');
@@ -96,15 +97,15 @@ let styles = cairn.style(sheet);
 class MyView extends React.Component {
   render() {
     return (
-      <Text ...styles('h1')>Main Heading</Text>
-      <Text ...styles('h2 italic')>Secondary Heading</Text>
+      <Text {...styles('h1')}>Main Heading</Text>
+      <Text {...styles('h2 italic')}>Secondary Heading</Text>
     );
   }
 }
 ````
 
-###`styles('foo.bar.baz')`
-Set up your stylesheet with parent-child relationships annotated via dot notation.  Then, use `cairn.styles` to expand a reference made directly to a child (e.g. `header.h1.user`) to contain references to every parent as well (`header, header.h1, header.h1.user`).
+###Styling Type 2: `styles('foo.bar.baz')`
+Set up your stylesheet with parent-child relationships annotated via dot notation.  Then, use cairn to expand a child reference (e.g. `header.h1.user`) to include parents as well (`header, header.h1, header.h1.user`).
 
 ````javascript
 let sheet = StyleSheet.create({
@@ -135,20 +136,18 @@ class MyView extends React.Component {
   render() {
     return (
       <!-- header, header.h1, header.h1.user -->
-      <Text styles={styles('header.h1.user')}>Primary Header Text</Text>
+      <Text {...styles('header.h1.user')}>Primary Header Text</Text>
       <!-- header, header.h2 -->
-      <Text styles={styles('header.h2')}>Secondary Header Text</Text>
+      <Text {...styles('header.h2')}>Secondary Header Text</Text>
       <!-- text, text.p -->
-      <Text styles={styles('text.p')}>Body Text</Text>
+      <Text {...styles('text.p')}>Body Text</Text>
     );
   }
 }
 ````
 
-##`cairn.pile([name ,] {})`
-An alternative to the above, manual method of constructing your stylesheet with dot notation is available, by nesting the objects instead and calling `pile`.
-
-Provide an optional name to the pile and all classes will be prefixed with that name.
+##`cairn.pile({})`
+To construct your stylesheet with dot notation via nesting objects, call `pile`.
 
 ````javascript
 let React = require('react-native');
@@ -188,11 +187,11 @@ class MyView extends React.Component {
   render() {
     return (
       <!-- header, header.h1, header.h1.user -->
-      <Text styles={styles('header.h1.user')}>Primary Header Text</Text>
+      <Text {...styles('header.h1.user')}>Primary Header Text</Text>
       <!-- header, header.h2 -->
-      <Text styles={styles('header.h2')}>Secondary Header Text</Text>
+      <Text {...styles('header.h2')}>Secondary Header Text</Text>
       <!-- text, text.p -->
-      <Text styles={styles('text.p')}>Body Text</Text>
+      <Text {...styles('text.p')}>Body Text</Text>
     );
   }
 }
@@ -248,7 +247,7 @@ class MyView extends React.Component {
   render() {
     let isActive = true;
     return (
-      <Text styles={styles('p active?', isActive)}>Always a P, not always active</Text>
+      <Text {...styles('p active?', isActive)}>Always a P, not always active</Text>
     );
   }
 }
@@ -275,7 +274,9 @@ class MyView extends React.Component {
   render() {
     let state = { isActive: true, blue: false };
     return (
-      <Text styles={styles('p blue? active?isActive', state)}>Are you active and blue?</Text>
+      <Text {...styles('p blue? active?isActive', state)}>
+        Are you active and blue?
+      </Text>
     );
   }
 }
