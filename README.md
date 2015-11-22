@@ -6,75 +6,17 @@ Cairn is a tiny library for React Native that replaces the default `styles={[sty
 npm install --save cairn
 ```
 
-###Background
-
-In React Native, there is no cascading of styles, so when you have multiple types of something, say a pageContainer, you may initially be tempted to style each individually:
-
-````javascript
-{
-  'pageContainer': {
-    flex: 1,
-    marginTop: 10,
-    marginBottom: 10
-  },
-  'pageContainerWithHeader': {
-    flex: 1,
-    marginTop: 20
-  },
-  'pageContainerWithFooter': {
-    flex: 1,
-    marginBottom: 20
-  },
-  'pageContainerWithHeaderAndFooter': {
-    flex: 1,
-    marginTop: 20,
-    marginBottom: 20
-  }
-}
-....
-<View styles={styles.pageContainerWithHeaderAndFooter}>Body Text</View>
-````
-
-This can be improved upon by extracting out the common bits into their own classes and styling your element via an array:
-
-````
-{
-  'pageContainer': {
-    flex: 1,
-    marginTop: 10,
-    marginBottom: 10
-  },
-  'pageContainerWithHeader': {
-    marginTop: 20
-  },
-  'pageContainerWithFooter': {
-    marginBottom: 20
-  }
-}
-....
-<View styles={[
-  styles.pageContainer, 
-  styles.pageContainerWithHeader, 
-  styles.pageContainerWithFooter ]}>
-  Body Text
-</View>
-````
-
-This is better, there's less redundancy in the styles, but the length of the class array can very quickly get out of hand when each bit of style is separated.  Additionally, there is a redundancy of "pageContainer" in the stylesheet.  What we need is a way to get the best of both worlds:
-
-1) Be able to separate our stylesheet out into a set of parent types and child types that extend their parents, and
-
-2) Reference this child type directly and get all the parent styling for free without having to compose it manually
-
 ###Basic Usage
-####First, call .style: `let styles = cairn.style(sheet[, options])`
-Pass to `cairn.style` your React Native Stylesheet object and use the returned function to apply the styles to elements.
+####`let styles = cairn.style(sheet[, options])`
+Pass to `cairn.style` your React Native Stylesheet or object containing styles and use the returned function to apply the styles to elements.
 
 **Available Options**
 
-`spread` (default: true): Enable/disable spread syntax. If false, use `style={styles('foo')}` instead.
+`spread` (default: true): Enable/disable spread syntax. If false, use `style={styles('foo')}`.
 
-####Styling Type 1: `styles('foo bar baz')`
+
+####Apply multiple styles
+#####`...styles('foo bar baz')`
 Apply multiple independent classes by passing a space-delimited string.  Classes are appended in order with last item having precedence.  Invalid class names will be ignored with a warning.
 
 ```javascript
@@ -104,7 +46,8 @@ class MyView extends React.Component {
 }
 ````
 
-###Styling Type 2: `styles('foo.bar.baz')`
+####Apply heirarchy of styles
+#####`...styles('foo.bar.baz')`
 Set up your stylesheet with parent-child relationships annotated via dot notation.  Then, use cairn to expand a child reference (e.g. `header.h1.user`) to include parents as well (`header, header.h1, header.h1.user`).
 
 ````javascript
@@ -145,6 +88,65 @@ class MyView extends React.Component {
   }
 }
 ````
+
+####Conditional styles
+#####`styles('foo bar? baz?', true/false)`
+Append on conditional classes with the `?` flag and pass the toggle state as a the second parameter.  Styles lacking the conditional flag are always applied.
+
+````javascript
+let sheet = StyleSheet.create({
+  'p': {
+    fontSize: 30
+  },
+  'active': {
+    fontSize: 20
+  }
+});
+let styles = cairn(sheet);
+
+class MyView extends React.Component {
+  render() {
+    let isActive = true;
+    return (
+      <Text {...styles('p active?', isActive)}>Always a P, not always active</Text>
+    );
+  }
+}
+````
+
+#####`styles('bar? baz?newName', { bar: true, newName: false })`
+Provide a hash as a second parameter and the value of the classname's corresponding property will be used as the toggle state of that class.  Specify a different property to use by specifying the property name after the `?`.
+
+````javascript
+let sheet = StyleSheet.create({
+  'p': {
+    fontSize: 30
+  },
+  'active': {
+    fontSize: 20
+  },
+  'blue': {
+    color: 'blue'
+  }
+});
+let styles = cairn(sheet);
+
+class MyView extends React.Component {
+  render() {
+    let state = { isActive: true, blue: false };
+    return (
+      <Text {...styles('p blue? active?isActive', state)}>
+        Are you active and blue?
+      </Text>
+    );
+  }
+}
+````
+
+####Inline styles
+#####`styles('foo', [{ color: 'red' }])`
+It may be necessary (such as with animations) to apply inline styles. Include an array of additional style objects to apply as the last parameter to `style`.  
+
 
 ##`cairn.pile({})`
 To construct your stylesheet with dot notation via nesting objects, call `pile`.
@@ -228,60 +230,65 @@ module.exports = StyleSheet.create(cairn.pile(sheet));
 
 ````
 
-####Conditional classes
-#####`styles('foo bar? baz?', true/false)`
-Append on conditional classes with the `?` flag and pass the toggle state as a the second parameter.  Styles lacking the conditional flag are always applied.
+##Background
+
+In React Native, there is no cascading of styles, so when you have multiple types of something, say a pageContainer, you may initially be tempted to style each individually:
 
 ````javascript
-let sheet = StyleSheet.create({
-  'p': {
-    fontSize: 30
+{
+  'pageContainer': {
+    flex: 1,
+    marginTop: 10,
+    marginBottom: 10
   },
-  'active': {
-    fontSize: 20
-  }
-});
-let styles = cairn(sheet);
-
-class MyView extends React.Component {
-  render() {
-    let isActive = true;
-    return (
-      <Text {...styles('p active?', isActive)}>Always a P, not always active</Text>
-    );
+  'pageContainerWithHeader': {
+    flex: 1,
+    marginTop: 20
+  },
+  'pageContainerWithFooter': {
+    flex: 1,
+    marginBottom: 20
+  },
+  'pageContainerWithHeaderAndFooter': {
+    flex: 1,
+    marginTop: 20,
+    marginBottom: 20
   }
 }
+....
+<View styles={styles.pageContainerWithHeaderAndFooter}>Body Text</View>
 ````
 
-#####`styles('bar? baz?newName', { bar: true, newName: false })`
-Provide a hash as a second parameter and the value of the classname's corresponding property will be used as the toggle state of that class.  Specify a different property to use by specifying the property name after the `?`.
+This can be improved upon by extracting out the common bits into their own classes and styling your element via an array:
 
-````javascript
-let sheet = StyleSheet.create({
-  'p': {
-    fontSize: 30
+````
+{
+  'pageContainer': {
+    flex: 1,
+    marginTop: 10,
+    marginBottom: 10
   },
-  'active': {
-    fontSize: 20
+  'pageContainerWithHeader': {
+    marginTop: 20
   },
-  'blue': {
-    color: 'blue'
-  }
-});
-let styles = cairn(sheet);
-
-class MyView extends React.Component {
-  render() {
-    let state = { isActive: true, blue: false };
-    return (
-      <Text {...styles('p blue? active?isActive', state)}>
-        Are you active and blue?
-      </Text>
-    );
+  'pageContainerWithFooter': {
+    marginBottom: 20
   }
 }
+....
+<View styles={[
+  styles.pageContainer, 
+  styles.pageContainerWithHeader, 
+  styles.pageContainerWithFooter ]}>
+  Body Text
+</View>
 ````
 
+This is better, there's less redundancy in the styles, but the length of the class array can very quickly get out of hand when each bit of style is separated.  Additionally, there is a redundancy of "pageContainer" in the stylesheet.  What we need is a way to get the best of both worlds:
+
+1) Be able to separate our stylesheet out into a set of parent types and child types that extend their parents, and
+
+2) Reference this child type directly and get all the parent styling for free without having to compose it manually
 
 ####What does it stand for?
-**C**SS **A**lternative **I**n **R**eact **N**ative.  Maybe.
+**Ca**scading **I**n **R**eact **N**ative.  Maybe.

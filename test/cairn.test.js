@@ -122,6 +122,14 @@ describe('cairn', function () {
         expect(styles('parent.child.invalid.grandchild')).to.eql([parent, child]);
       });
     });
+
+    describe('inline styles', function () {
+      it('should append on the array of inline styles at the end', function () {
+        let inline1 = { color: 'red' };
+        let inline2 = { color: 'blue' };
+        expect(styles('thingOne', [inline1, inline2])).to.eql([thingOne, inline1, inline2]);
+      });
+    });
   });
 
   describe('pile', function () {
