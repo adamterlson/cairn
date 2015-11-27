@@ -1,38 +1,74 @@
+[![Build Status](https://travis-ci.org/adamterlson/cairn.svg?branch=master)](https://travis-ci.org/adamterlson/cairn)
+
 # Cairn
-Cairn is a tiny library for React Native that replaces the default `styles={[styles.foo, styles.bar]}` styling sytnax with a simpler string-based spread syntax: `{...style('foo bar')}`.  Cairn supports defining multiple classes, applying heirarchically-defined classes en masse, and conditional classes.
+Cairn is a tiny library for React Native that replaces the default `styles={[styles.foo, styles.bar]}` styling sytnax with a simpler string-based spread syntax: `{...style('foo bar')}`.  Cairn supports defining multiple classes, applying hierarchically-defined classes en masse, and conditional classes.
 
 If you're not sure why you want this, check out the [Background](#background) section.
 
-##Install
+##Getting Started
 ```
 npm install --save cairn
 ```
 
-###Basic Usage
-####`let style = cairn.style(sheet[, options])`
-Pass to `cairn.style` your React Native Stylesheet or object containing styles and use the returned function to apply the styles to elements.
+```
+let cairn = requrie('cairn');
+let stylesheet = cairn.pile({ ... });
+let style = cairn.style(stylesheet);
+...
+<View {...style('...')} />
+```
 
+##Applying Styles - `cairn.style`
+Pass to `cairn.style` your React Native Stylesheet or object containing styles and options.  **Important** this returns another function.  User this to apply the styles to elements.
+
+```
+let style = cairn.style(stylesheet [, options]);
+<View {...style('...')} />
+```
 **Available Options**
 
 `spread` (default: true): Enable/disable spread syntax. If false, use `style={style('foo')}`.
 
 
-####Apply multiple styles
-#####`...style('foo bar baz')`
-Apply multiple independent classes by passing a space-delimited string.  Classes are appended in order with last item having precedence.  Invalid class names will be ignored with a warning.
+####Types of Styles
+Apply multiple classes by passing a space-delimited string.  Classes are appended in order with last item having precedence.  Invalid class names will be ignored with a warning.  All types of styles can be used simultaneously.
+
+**Basic: `...style('foo')`**
+
+Apply just the specified class by name.
+
+**Hierarchy: `...style('foo.bar.baz')`**
+
+Apply an entire hierarchy of classes at once.  The above is equivalent to `style={[styles.foo, styles.foo.bar, styles.foo.bar.baz]}`.  
+
+See Style Hierarchies section below.
+
+**Conditional: `...style('foo bar? baz?', toggle)`**
+
+Conditionally apply a style based on the state of toggle.  If toggle is a boolean, the boolean's value will be used.  If an object is given, the corresponding key in the object will be used instead.  Map the class to a new property by defining the mapped key after the `?` operator: `foo?newName`.
+
+```
+<Text {...style('p complete?name error?', { name: 'Bob', error: 'Too Short!' })}>...</Text>
+```
+
+**Inline: `...style('foo', [{ color: 'red' }])`**
+
+Sometimes necessary for animations, inline styles can be appended via an array of inline styles or stylesheet references.  Not recommended generally.
+
 
 ```javascript
 let React = require('react-native');
 let cairn = require('cairn');
 let { Text, StyleSheet } = React;
 let sheet = StyleSheet.create({
-  'h1': {
+  'header': {
+    fontWeight: 'bold',
     fontSize: 30
   },
-  'h2': {
+  'header.secondary': {
     fontSize: 20
   },
-  'italic': {
+  'error': {
     fontStyle: 'italic'
   }
 });
@@ -41,113 +77,18 @@ let style = cairn.style(sheet);
 class MyView extends React.Component {
   render() {
     return (
-      <Text {...style('h1')}>Main Heading</Text>
-      <Text {...style('h2 italic')}>Secondary Heading</Text>
+      <Text {...style('header')}>Primary Heading</Text>
+      <Text {...style('header.secondary')}>Secondary Heading</Text>
+      <Text {...style('error?incomplete', { incomplete: true })}>Error Text</Text>
     );
   }
 }
 ````
 
-####Apply heirarchy of styles
-#####`...style('foo.bar.baz')`
-Set up your stylesheet with parent-child relationships annotated via dot notation.  Then, use cairn to expand a child reference (e.g. `header.h1.user`) to include parents as well (`header, header.h1, header.h1.user`).
+Instead of defining your heirarchy manaully, cairn can do it for you.
 
-````javascript
-let sheet = StyleSheet.create({
-  'header': {
-    fontFamily: 'Georgia',
-    textDecorationLine: 'underline'
-  },
-  'header.h1': {
-    fontSize: 30
-  },
-  'header.h1.user': {
-    color: 'red'
-  },
-  'header.h2': {
-    fontSize: 20
-  },
-  'text': {
-    fontFamily: 'Cochin',
-    color: '#222'
-  },
-  'text.p': {
-    marginBottom: 10
-  }
-});
-let style = cairn.style(sheet);
-
-class MyView extends React.Component {
-  render() {
-    return (
-      <!-- header, header.h1, header.h1.user -->
-      <Text {...style('header.h1.user')}>Primary Header Text</Text>
-      <!-- header, header.h2 -->
-      <Text {...style('header.h2')}>Secondary Header Text</Text>
-      <!-- text, text.p -->
-      <Text {...style('text.p')}>Body Text</Text>
-    );
-  }
-}
-````
-
-####Conditional styles
-#####`style('foo bar? baz?', true/false)`
-Append on conditional classes with the `?` flag and pass the toggle state as a the second parameter.  Styles lacking the conditional flag are always applied.
-
-````javascript
-let sheet = StyleSheet.create({
-  'p': {
-    fontSize: 30
-  },
-  'active': {
-    fontSize: 20
-  }
-});
-let style = cairn(sheet);
-
-class MyView extends React.Component {
-  render() {
-    let isActive = true;
-    return (
-      <Text {...style('p active?', isActive)}>Always a P, not always active</Text>
-    );
-  }
-}
-````
-
-#####`style('bar? baz?newName', { bar: truthy, newName: falsey })`
-Provide a hash as a second parameter and the value of the classname's corresponding property will be used as the toggle state of that class.  Specify a different property to use by specifying the property name after the `?`.
-
-````javascript
-let sheet = StyleSheet.create({
-  'p': {
-    fontSize: 30
-  },
-  'error': {
-    color: 'blue'
-  }
-});
-let style = cairn(sheet);
-
-class MyView extends React.Component {
-  render() {
-    return (
-      <Text {...style('p error?name', this.props)}>
-        { this.props.name ? 'Thanks!' : 'Please enter your name.' }
-      </Text>
-    );
-  }
-}
-````
-
-####Inline styles
-#####`style('foo', [{ color: 'red' }])`
-It may be necessary (such as with animations) to apply inline styles. Include an array of additional style objects to apply as the last parameter to `style`.  
-
-
-##`cairn.pile({})`
-Construct your stylesheet with dot notation via nesting objects.
+##Style Hierarchies
+Use `cairn.pile({})` and you can define style relationships using nesting objects.
 
 ````javascript
 let React = require('react-native');
@@ -155,28 +96,23 @@ let cairn = require('cairn');
 let { Text, View, StyleSheet } = React;
 
 let pile = cairn.pile({
-  header: {
-    fontFamily: 'Georgia',
-    textDecorationLine: 'underline',
-
-    h1: {
-      fontSize: 30,
-
-      user: {
-        color: 'red'
-      }
-    },
-
-    h2: {
-      fontSize: 20
-    }
-  }
   text: {
     fontFamily: 'Cochin',
     color: '#222',
 
-    p: {
-      marginBottom: 10
+    header: {
+      fontFamily: 'Georgia',
+      textDecorationLine: 'underline',
+  
+      h1: {
+        fontSize: 30,
+  
+        user: {
+          color: 'red'
+        }
+      },
+  
+      h2: { fontSize: 20 }
     }
   }
 });
@@ -186,12 +122,12 @@ let style = cairn.style(sheet);
 class MyView extends React.Component {
   render() {
     return (
-      <!-- header, header.h1, header.h1.user -->
-      <Text {...style('header.h1.user')}>Primary Header Text</Text>
-      <!-- header, header.h2 -->
-      <Text {...style('header.h2')}>Secondary Header Text</Text>
-      <!-- text, text.p -->
-      <Text {...style('text.p')}>Body Text</Text>
+      <!-- text, header, header.h1, header.h1.user -->
+      <Text {...style('text.header.h1.user')}>Primary Header Text</Text>
+      <!-- text, header, header.h2 -->
+      <Text {...style('text.header.h2')}>Secondary Header Text</Text>
+      <!-- text -->
+      <Text {...style('text')}>Body Text</Text>
     );
   }
 }
@@ -227,6 +163,7 @@ let sheet = {
 module.exports = StyleSheet.create(cairn.pile(sheet));
 
 ````
+
 
 ##Background
 
