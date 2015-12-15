@@ -327,6 +327,20 @@ describe('cairn', function () {
           }
         })
       });
+
+      it('should bomb if the props defines styles', function () {
+        expect(() => {
+          pile({
+            foo: {
+              props: {
+                styles: {
+                  bar: 'bar'
+                }
+              }
+            }
+          });
+        }).to.throw('Invalid `props` definition');
+      });
     });
   });
 });
