@@ -10,39 +10,37 @@ npm install --save cairn
 ```
 
 ```
-let cairn = require('cairn');
-let stylesheet = cairn.pile({ ... });
-let style = cairn.style(stylesheet);
+let cairn = requrie('cairn');
+let style = cairn({ ... });
 ...
-<View {...style('...')} />
+<View {...style(' ... ')} />
 ```
 
-## Applying Styles - `cairn.style`
-Pass to `cairn.style` your React Native Stylesheet or object containing styles and options.  **Important** this returns another function.  User this to apply the styles to elements.
+###`cairn(stylesheet [, styleTransform])`
+Pass to `cairn` your stylesheet.  This **returns a new function** which is used to apply the styles to specific elements.  This is essentially equivalent to `cairn.style(cairn.pile(stylesheet))`.
 
-```
-let style = cairn.style(stylesheet [, options]);
-<View {...style('...')} />
-```
-**Available Options**
+**styleTransform**
 
-`spread` (default: true): Enable/disable spread syntax. If false, use `style={style('foo')}`.
+`function(styles)` - Optional - Called with flattened styles with props removed.  Expected return: the styles to be used.  This is a hook for calling `StyleSheet.create`.
 
+###Applying Styles - `style(...)`
+Apply classes by passing a space-delimited string to `style` which is the function returned from both `cairn` and `cairn.style` (where the former first calls `pile` for you while the latter does not).  Classes are appended in order with last item having precedence.  Invalid class names will be ignored with a warning.  All types of styles can be used simultaneously.
 
-#### Types of Styles
-Apply multiple classes by passing a space-delimited string.  Classes are appended in order with last item having precedence.  Invalid class names will be ignored with a warning.  All types of styles can be used simultaneously.
+This function returns an object (`{ styles: [...], [custom props] }`) which can then be spread onto your component: `<View {...styles('foo')}`.
 
-**Basic: `...style('foo')`**
+#### Selector Types
+
+**Basic: `style('foo')`**
 
 Apply just the specified class by name.
 
-**Hierarchy: `...style('foo.bar.baz')`**
+**Piled Hierarchy: `style('foo.bar.baz')`**
 
 Apply an entire hierarchy of classes at once.  The above is equivalent to `style={[styles.foo, styles.foo.bar, styles.foo.bar.baz]}`.  
 
-See Style Hierarchies section below.
+See how to create piled stylesheets in the section below.
 
-**Conditional: `...style('foo bar? baz?', toggle)`**
+**Conditional: `style('foo bar? baz?', toggle)`**
 
 Conditionally apply a style based on the state of toggle.  If toggle is a boolean, the boolean's value will be used.  If an object is given, the corresponding key in the object will be used instead.  Map the class to a new property by defining the mapped key after the `?` operator: `foo?newName`.
 
@@ -50,30 +48,33 @@ Conditionally apply a style based on the state of toggle.  If toggle is a boolea
 <Text {...style('p complete?name error?', { name: 'Bob', error: 'Too Short!' })}>...</Text>
 ```
 
-**Inline: `...style('foo', [{ color: 'red' }])`**
+**Inline: `style('foo', [{ color: 'red' }])`**
 
-Sometimes necessary for animations, inline styles can be appended via an array of inline styles or stylesheet references.  Not recommended generally.
+Sometimes necessary, inline styles can be appended via an array of inline styles or stylesheet references.  Not recommended.
 
 
 ```javascript
-let React = require('react-native');
-let cairn = require('cairn');
-let { Text, StyleSheet } = React;
-let sheet = StyleSheet.create({
+import { Text, StyleSheet, Component } from 'react-native';
+import cairn from 'cairn';
+
+let sheet = {
   'header': {
     fontWeight: 'bold',
     fontSize: 30
   },
+  // Using `pile`, this can be a nested object
+  // but without, it must be explicitly named
   'header.secondary': {
     fontSize: 20
   },
   'error': {
     fontStyle: 'italic'
   }
-});
-let style = cairn.style(sheet);
+};
 
-class MyView extends React.Component {
+let style = cairn(sheet, (styles) => StyleSheet.create(styles));
+
+class MyView extends Component {
   render() {
     return (
       <Text {...style('header')}>Primary Heading</Text>
@@ -84,20 +85,29 @@ class MyView extends React.Component {
 }
 ````
 
-Instead of defining your heirarchy manaully, cairn can do it for you.
+###Piled Stylesheets
+The stylesheet object passed to the `cairn` factory function is passed on to `cairn.pile` for you, but can be used directly via `cairn.pile({})`.  Pile adds support for the nesting of objects and definining custom props.
 
-## Style Hierarchies - `cairn.pile`
-Use `cairn.pile({})` and you can define style relationships using nesting objects.
+####Nested Objects
+Using a nested object defines a parent-child relationship for later en-masse style application.  This is equivalent to naming your classes with dots, as above ('header.secondary').   Child styles take precedence and override parent style definitions.
+
+####Custom Props
+Use the keyword `props` to define presentation attributes besides `styles`. Child props take precedence, just like styles.
+
+There are many React Native components that use properties other than `styles` for presentation (e.g.  `TouchableHighlight`'s underlayColor).  You can define all these presentation attributes in one place by using `props`.
+
+###Example
 
 ````javascript
-let React = require('react-native');
-let cairn = require('cairn');
-let { Text, View, StyleSheet } = React;
+import { View, Text, StyleSheet, Component } from 'react-native';
+import cairn from 'cairn';
 
-let pile = cairn.pile({
+const colors = { blue: 'blue', gray: 'gray', red: 'red' };
+
+let style = cairn({
   text: {
     fontFamily: 'Cochin',
-    color: '#222',
+    color: colors.gray,
 
     header: {
       fontFamily: 'Georgia',
@@ -113,54 +123,40 @@ let pile = cairn.pile({
   
       h2: { fontSize: 20 }
     }
+  },
+  button: {
+    props: {
+      underlayColor: colors.gray
+    },
+    backgroundColor: colors.blue,
+
+    user: {
+      props: {
+        underlayColor: colors.red
+      }
+    }
   }
-});
-let sheet = StyleSheet.create(pile);
-let style = cairn.style(sheet);
+}, (styles) => StyleSheet.create(styles));
 
 class MyView extends React.Component {
   render() {
     return (
-      <!-- text, header, header.h1, header.h1.user -->
-      <Text {...style('text.header.h1.user')}>Primary Header Text</Text>
-      <!-- text, header, header.h2 -->
-      <Text {...style('text.header.h2')}>Secondary Header Text</Text>
-      <!-- text -->
-      <Text {...style('text')}>Body Text</Text>
+      <View>
+        <!-- text, header, header.h1, header.h1.user -->
+        <Text {...style('text.header.h1.user')}>Primary User Header Text</Text>
+
+        <!-- text, header, header.h2 -->
+        <Text {...style('text.header.h2')}>Secondary Header Text</Text>
+
+        <!-- button, button.user -->
+        <TouchableHighlight {...style('button')} onPress={() => {}}>
+          <!-- text, text.button -->
+          <Text {...style('text.button')}>Button Text</Text>
+        </TouchableHighlight>
+      </View>
     );
   }
 }
-````
-
-If your stylesheet gets large enough, you may want to separate it out into multiple files:
-
-````javascript
-let React = require('react-native');
-let cairn = require('cairn');
-let { StyleSheet } = React;
-
-// Do not pile any of these, just return objects
-let headlines = require('./headlines');
-let links = require('./links');
-let paragraphs = require('./paragraphs');
-let buttons = require('./buttons');
-let panels = require('./panels');
-
-let sheet = {
-  text: {
-    // Applies to all child types of text
-    fontFamily: 'Helvetica',
-
-    headlines,
-    links,
-    paragraphs
-  },
-  buttons,
-  panels
-};
-
-module.exports = StyleSheet.create(cairn.pile(sheet));
-
 ````
 
 
@@ -223,12 +219,6 @@ This is better, there's less redundancy in the styles, but the length of the cla
 
 2) Reference this child type directly and get all the parent styling for free without having to compose it manually
 
-### Case Study
+Additionally, some components define presentation attributes outside of `styles`, for example TouchableHighlight's `underlayColor`.  In order to reference colors defined and used elsewhere in your stylesheet on these components, your file must additionally export colors.  This is an inconvenience, so it'd be nice if our solution to the above included the ability to merge the definition of presentation with its application.
 
-Imagine you want to change the font family for all text in your entire application within React Native.  This means you need to give a style attribute to every `<Text>` tag, and if you have multiple kinds of text elements, you must repeat your `fontFamily: 'MyFont'` line in every type of text's class, or apply multiple multiple to every text element.  Redundancy in your styles or an unweildy array of styles on every text element in your views.  
-
-Pick your evil.
-
-Now, you want to change the font family for a type of text element, say headers.  You must update every class in your stylesheet (i.e. change every `fontFamily` line on header types) or add ANOTHER class in every component (i.e. change the name of class being used or add an additional class to every `text` element). 
-
-With Cairn, you could instead define a top level `text` namespace, define the defaults there that apply to all text elements, have subtypes for your more specific types like `text.body` or `text.headers` which can have their own children.  Then, changing the font style later for all text or all headers is easy: just change one line in the stylesheet and all the children's styles will be updated because they extend from it.
+Cairn does all of this!
