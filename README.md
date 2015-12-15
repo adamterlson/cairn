@@ -16,14 +16,13 @@ let style = cairn({ ... });
 <View {...style(' ... ')} />
 ```
 
-###`cairn(stylesheet [, styleTransform])`
+### `cairn(stylesheet [, styleTransform])`
 Pass to `cairn` your stylesheet.  This **returns a new function** which is used to apply the styles to specific elements.  This is essentially equivalent to `cairn.style(cairn.pile(stylesheet))`.
 
-**styleTransform**
+**styleTransform** - `function(styles)` - Optional - Called with flattened styles with props removed.  Expected return: the styles to be used.  This is a hook for calling `StyleSheet.create`.
 
-`function(styles)` - Optional - Called with flattened styles with props removed.  Expected return: the styles to be used.  This is a hook for calling `StyleSheet.create`.
+### Applying Styles - `style(...)`
 
-###Applying Styles - `style(...)`
 Apply classes by passing a space-delimited string to `style` which is the function returned from both `cairn` and `cairn.style` (where the former first calls `pile` for you while the latter does not).  Classes are appended in order with last item having precedence.  Invalid class names will be ignored with a warning.  All types of styles can be used simultaneously.
 
 This function returns an object (`{ styles: [...], [custom props] }`) which can then be spread onto your component: `<View {...styles('foo')}`.
@@ -85,18 +84,18 @@ class MyView extends Component {
 }
 ````
 
-###Piled Stylesheets
+### Piled Stylesheets
 The stylesheet object passed to the `cairn` factory function is passed on to `cairn.pile` for you, but can be used directly via `cairn.pile({})`.  Pile adds support for the nesting of objects and definining custom props.
 
-####Nested Objects
+#### Nested Objects
 Using a nested object defines a parent-child relationship for later en-masse style application.  This is equivalent to naming your classes with dots, as above ('header.secondary').   Child styles take precedence and override parent style definitions.
 
-####Custom Props
+#### Custom Props
 Use the keyword `props` to define presentation attributes besides `styles`. Child props take precedence, just like styles.
 
 There are many React Native components that use properties other than `styles` for presentation (e.g.  `TouchableHighlight`'s underlayColor).  You can define all these presentation attributes in one place by using `props`.
 
-###Example
+### Example
 
 ````javascript
 import { View, Text, StyleSheet, Component } from 'react-native';
