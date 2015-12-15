@@ -1,24 +1,23 @@
 [![Build Status](https://travis-ci.org/adamterlson/cairn.svg?branch=master)](https://travis-ci.org/adamterlson/cairn)
-
 # Cairn
 Cairn is a tiny library for React Native that replaces the default `styles={[styles.foo, styles.bar]}` styling sytnax with a simpler string-based spread syntax: `{...style('foo bar')}`.  Cairn supports defining multiple classes, applying hierarchically-defined classes en masse, and conditional classes.
 
 If you're not sure why you want this, check out the [Background](#background) section.
 
-##Getting Started
+## Getting Started
 ```
 npm install --save cairn
 ```
 
 ```
-let cairn = requrie('cairn');
+let cairn = require('cairn');
 let stylesheet = cairn.pile({ ... });
 let style = cairn.style(stylesheet);
 ...
 <View {...style('...')} />
 ```
 
-##Applying Styles - `cairn.style`
+## Applying Styles - `cairn.style`
 Pass to `cairn.style` your React Native Stylesheet or object containing styles and options.  **Important** this returns another function.  User this to apply the styles to elements.
 
 ```
@@ -30,7 +29,7 @@ let style = cairn.style(stylesheet [, options]);
 `spread` (default: true): Enable/disable spread syntax. If false, use `style={style('foo')}`.
 
 
-####Types of Styles
+#### Types of Styles
 Apply multiple classes by passing a space-delimited string.  Classes are appended in order with last item having precedence.  Invalid class names will be ignored with a warning.  All types of styles can be used simultaneously.
 
 **Basic: `...style('foo')`**
@@ -87,7 +86,7 @@ class MyView extends React.Component {
 
 Instead of defining your heirarchy manaully, cairn can do it for you.
 
-##Style Hierarchies
+## Style Hierarchies - `cairn.pile`
 Use `cairn.pile({})` and you can define style relationships using nesting objects.
 
 ````javascript
@@ -165,8 +164,7 @@ module.exports = StyleSheet.create(cairn.pile(sheet));
 ````
 
 
-##Background
-
+## Background
 In React Native, there is no cascading of styles, so when you have multiple types of something, say a pageContainer, most will begin by styling each individually:
 
 ````javascript
@@ -225,7 +223,8 @@ This is better, there's less redundancy in the styles, but the length of the cla
 
 2) Reference this child type directly and get all the parent styling for free without having to compose it manually
 
-###Case Study
+### Case Study
+
 Imagine you want to change the font family for all text in your entire application within React Native.  This means you need to give a style attribute to every `<Text>` tag, and if you have multiple kinds of text elements, you must repeat your `fontFamily: 'MyFont'` line in every type of text's class, or apply multiple multiple to every text element.  Redundancy in your styles or an unweildy array of styles on every text element in your views.  
 
 Pick your evil.

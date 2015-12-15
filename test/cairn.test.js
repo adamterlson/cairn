@@ -1,20 +1,22 @@
 'use strict';
 
-let cairn = require('../lib');
+import cairn, { pile } from '../lib';
+
+
 var expect = require('chai').expect;
 
 describe('cairn', function () {
   let style,
       styles,
-      pile,
       sheet,
       thingOne = { fontSize: 10 },
-      thingOneWithProps = { fontSize: 10, props: { underlayColor: 'red' }},
       thingTwo = { fontSize: 20 },
-      thingTwoWithProps = { fontSize: 20, props: { overlayColor: 'blue' }},
       parent = { fontSize: 30 },
       child = { fontSize: 40 },
       grandchild = { fontSize: 50 },
+
+      thingOneWithProps = { fontSize: 10, props: { underlayColor: 'red' }},
+      thingTwoWithProps = { fontSize: 20, props: { overlayColor: 'blue' }},
       parentWithProps = { fontSize: 10, props: { underlayColor: 'red' }},
       childWithProps = { fontSize: 20, props: { overlayColor: 'blue' }},
       grandchildWithProps = { fontSize: 30, props: {
@@ -23,27 +25,18 @@ describe('cairn', function () {
       }};
 
   beforeEach(function () {
-    styles = {
+    sheet = {
       thingOne,
       thingTwo,
       parent,
       'parent.child': child,
       'parent.child.grandchild': grandchild
     };
-    sheet = { styles };
 
-    style = cairn.style(sheet, { spread: false });
-    pile = cairn.pile;
+    style = cairn(sheet);
   });
 
   describe('style', function () {
-    describe('spread syntax support', function () {
-      it('should default to spread syntax', function () {
-        style = cairn.style(sheet);
-        expect(style('thingOne')).to.eql({ style: [thingOne]});
-      });
-    });
-
     it('should select the appropriate styles for a single selector', function () {
       expect(style('thingOne')).to.eql({ style: [thingOne] });
     });
@@ -150,7 +143,7 @@ describe('cairn', function () {
           'parent.child': childWithProps,
           'parent.child.grandchild': grandchildWithProps
         };
-        style = cairn.style(cairn.pile(sheet));
+        style = cairn(sheet);
       });
       it('should return props defined as a top-level peer to style', function () {
         expect(style('parent')).to.eql({
