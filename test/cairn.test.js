@@ -1,7 +1,6 @@
 'use strict';
 
-import cairn, { pile } from '../lib';
-
+import cairn, { pile, style as foo } from '../lib';
 
 var expect = require('chai').expect;
 
@@ -34,6 +33,19 @@ describe('cairn', function () {
     };
 
     style = cairn(sheet);
+  });
+
+  describe('factory', function () {
+    it('should call return a piled sheet', function () {
+      let nested = { parent: { child: { attr: 10 } } };
+      expect(cairn(nested)('parent.child')).to.eql({ style: [{ attr: 10 }] });
+    });
+
+    it('should transform styles', function () {
+      let style = cairn({}, () => { return { 'c.d': 'e' } });
+
+      expect(style('c.d')).to.eql({ style: ['e'] });
+    });
   });
 
   describe('style', function () {
@@ -292,6 +304,19 @@ describe('cairn', function () {
       })
     });
 
+    describe('empty parent', function () {
+      it('should strip empty parents', function () {
+        expect(pile({ parent: { child: { attr: 10 } } })).to.eql({
+          props: {},
+          styles: {
+            'parent.child': {
+              attr: 10
+            }
+          }
+        });
+      });
+    });
+
     describe('with props', function () {
       beforeEach(function () {
         sheet = {
@@ -314,7 +339,6 @@ describe('cairn', function () {
       it('should compile props separately from styles', function () {
         expect(pile(sheet)).to.eql({
           styles: {
-            'childWithProps': {},
             'childWithProps.grandchildWithProps': {
               color: 'red'
             }
