@@ -21,7 +21,11 @@ describe('cairn', function () {
       grandchildWithProps = { fontSize: 30, props: {
         overlayColor: 'black',
         highlightColor: 'purple'
-      }};
+      }},
+
+      propsOnly = {
+        props: { underlayColor: 'red' }
+      };
 
   beforeEach(function () {
     sheet = {
@@ -29,7 +33,8 @@ describe('cairn', function () {
       thingTwo,
       parent,
       'parent.child': child,
-      'parent.child.grandchild': grandchild
+      'parent.child.grandchild': grandchild,
+      propsOnly
     };
 
     style = cairn(sheet);
@@ -60,20 +65,25 @@ describe('cairn', function () {
     describe('warning', function () {
       it('should not warn if the sytle is defined', function () {
         let warnings = 0;
-        console.warn = function () {
-          warnings++;
-        }
+        console.warn = () => warnings++;
 
         style('thingOne');
 
         expect(warnings).to.eql(0);
       });
 
+      it('should not warn if there are defined props', function () {
+        let warnings = 0;
+        console.warn = () => warnings++;
+
+        style('propsOnly');
+
+        expect(warnings).to.eql(0);
+      });
+
       it('should warn if the sytle is not defined', function () {
         let warnings = 0;
-        console.warn = function () {
-          warnings++;
-        }
+        console.warn = () => warnings++;
 
         style('bad');
 
@@ -82,9 +92,7 @@ describe('cairn', function () {
 
       it('should warn only once for the deepest call of style', function () {
         let warnings = 0;
-        console.warn = function () {
-          warnings++;
-        }
+        console.warn = () => warnings++;
 
         style('thingOne.one.two.three.four');
 
