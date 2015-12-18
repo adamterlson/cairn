@@ -57,6 +57,41 @@ describe('cairn', function () {
       expect(style('thingOne thingTwo')).to.eql({ style: [thingOne, thingTwo] });
     });
 
+    describe('warning', function () {
+      it('should not warn if the sytle is defined', function () {
+        let warnings = 0;
+        console.warn = function () {
+          warnings++;
+        }
+
+        style('thingOne');
+
+        expect(warnings).to.eql(0);
+      });
+
+      it('should warn if the sytle is not defined', function () {
+        let warnings = 0;
+        console.warn = function () {
+          warnings++;
+        }
+
+        style('bad');
+
+        expect(warnings).to.eql(1);
+      });
+
+      it('should warn only once for the deepest call of style', function () {
+        let warnings = 0;
+        console.warn = function () {
+          warnings++;
+        }
+
+        style('thingOne.one.two.three.four');
+
+        expect(warnings).to.eql(1);
+      });
+    });
+
     describe('optional selectors', function () {
       it('should toggle keys conditional keys with a toggle false', function () {
         expect(style('thingOne?', false)).to.eql({ style: [] });

@@ -133,11 +133,9 @@ Pass to `cairn` your stylesheet.  This **returns a new function** which is used 
 * `stylesheet` - Object - The stylesheet of application styles.
 * `styleTransform` - Function - Optional - Called with flattened styles with props removed.  Expected return: the styles to be used.  This is a hook for calling `StyleSheet.create`.
 
-> **Note:** `cairn()` returns a new function which is then used to apply your styles.  Also, this is equivalent to calling `cairn.style(cairn.pile(stylesheet))`.
-
 ### `style(selectors)`
 
-Apply styles by passing a space-delimited string to `style`  (the function returned from `cairn`) and then spread the result onto a Component.  Selected styles are appended in order with last item having precedence. Selectors without a style definition will be ignored with a warning.
+Apply styles by passing a space-delimited string to `style`  (the function returned from `cairn`) and then spread the result onto a component.  Selected styles are appended in order with last item having precedence. Selectors without a style definition will be ignored with a warning.
 
 #### Types of Selectors 
 
@@ -193,26 +191,30 @@ class MyView extends Component {
 }
 ```
 
-### `let piledStylesheet = cairn.pile(stylesheet)`
+### Manual Styling and Piling
+
+```javascript
+import { pile, style } from 'cairn';
+```
+
+#### `let piledStylesheet = pile(stylesheet)`
 
 Reduce the nested stylesheet containing props into an object with two properties: `styles` and `props`.
 
 **Parameters**
  
 * `stylesheet` - Object - Your stylesheetwith nested objects and props.
- 
-> It's recommended to use the factory function `cairn` instead of calling `cairn.pile` directly.
 
 
-### `let style = cairn.style(piledStylesheet)`
+#### `let style = style(piledStylesheet)`
 
 Create a style selector over the given stylesheet.
 
 **Parameters**
  
 * `piled-stylesheet` - Object - Contains two properties: `styles` (a flat, normal stylesheet) and `props` with stylesheet-like structure but defining props instead.
- 
-> It's recommended to use the factory function `cairn` instead of calling `cairn.style` directly.
+
+> It's recommended to use the utility function `cairn` instead of calling `cairn.style` or `cairn.pile` directly.
 
 
 ## Background
