@@ -2,7 +2,11 @@
 # Cairn
 Cairn is a tiny library for React Native that replaces the default `styles={[styles.foo, styles.bar]}` styling sytnax with a simpler, string-based spread syntax: `{...style('foo bar')}`.  Cairn supports defining multiple classes, applying hierarchically-defined classes en masse, and conditional classes.
 
+Instead of trying to shim a CSS preprocessor, Cairn embraces the power ([and advantages](https://facebook.github.io/react-native/docs/style.html)) of JavaScript-based styling.
+
 If you're not sure why you want this, check out the [Background](#background) section.
+
+Cairn has no dependencies.
 
 ## Install
 ```
@@ -89,7 +93,9 @@ export default cairn({
 ```
 
 ### Cairn Selectors
-Apply your styles in a simple, yet powerful way using strings instead of arrays of object references:
+Apply your styles in a simple, yet powerful way using strings instead of arrays of object references.
+
+For more information the different types of selectors Cairn supports (Basic, Hierarchical, and Conditional) see the [API section](#styleselectors) below.
 
 ```javascript
 // MyComponent.js
@@ -119,9 +125,6 @@ class MyComponent extends React.Component {
 > `style` returns an object containing all the properties it will set on the component, so if you do not wish to use the spread syntax, you can access and apply `styles` and other directly: 
 > `<TouchableHighlight styles={style('foo').styles} underlayColor={styles('foo').underlayColor} />`.
 
-> For all of the different ways you can apply styles in Cairn, see the API section below.
-
-
 ## API
 
 ### `let style = cairn(stylesheet [, styleTransform])`
@@ -146,8 +149,6 @@ Apply just the specified class by name.
 **Hierarchy: `style('foo.bar.baz')`**
 
 Apply an entire hierarchy of classes at once.  The above is equivalent to `style={[styles.foo, styles.foo.bar, styles.foo.bar.baz]}`.  
-
-See how to create piled stylesheets in the section below.
 
 **Conditional: `style('foo bar? baz?', toggle)`**
 
@@ -190,32 +191,6 @@ class MyView extends Component {
   }
 }
 ```
-
-### Manual Styling and Piling
-
-```javascript
-import { pile, style } from 'cairn';
-```
-
-#### `let piledStylesheet = pile(stylesheet)`
-
-Reduce the nested stylesheet containing props into an object with two properties: `styles` and `props`.
-
-**Parameters**
- 
-* `stylesheet` - Object - Your stylesheetwith nested objects and props.
-
-
-#### `let style = style(piledStylesheet)`
-
-Create a style selector over the given stylesheet.
-
-**Parameters**
- 
-* `piled-stylesheet` - Object - Contains two properties: `styles` (a flat, normal stylesheet) and `props` with stylesheet-like structure but defining props instead.
-
-> It's recommended to use the utility function `cairn` instead of calling `cairn.style` or `cairn.pile` directly.
-
 
 ## Background
 In React Native, there is no cascading of styles, so when you have multiple types of something, say a pageContainer, most will begin by styling each individually:
