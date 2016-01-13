@@ -18,17 +18,21 @@ npm install --save cairn
 ```
 let cairn = requrie('cairn');
 let style = cairn({
-	parent: {
+	first: {
     	backgroundColor: 'red',
-        
+
         child: {
         	backgroundColor: 'blue'
         }
+    },
+    second: {
+        height: 10,
+        width: 10
     }
 });
 ...
-<!-- Will be blue -->
-<View {...style('parent.child')} />
+<!-- Will be blue and 10x10  -->
+<View {...style('first.child second')} />
 ```
 
 
@@ -61,15 +65,15 @@ export default cairn({
     header: {
       fontFamily: 'Georgia',
       textDecorationLine: 'underline',
-  
+
       h1: {
         fontSize: 30,
-  
+
         user: {
           color: 'red'
         }
       },
-  
+
       h2: { fontSize: 20 }
     },
 
@@ -122,7 +126,7 @@ class MyComponent extends React.Component {
   }
 }
 ```
-> `style` returns an object containing all the properties it will set on the component, so if you do not wish to use the spread syntax, you can access and apply `styles` and other directly: 
+> `style` returns an object containing all the properties it will set on the component, so if you do not wish to use the spread syntax, you can access and apply `styles` and other directly:
 > `<TouchableHighlight styles={style('foo').styles} underlayColor={styles('foo').underlayColor} />`.
 
 ## API
@@ -140,7 +144,7 @@ Pass to `cairn` your stylesheet.  This **returns a new function** which is used 
 
 Apply styles by passing a space-delimited string to `style`  (the function returned from `cairn`) and then spread the result onto a component.  Selected styles are appended in order with last item having precedence. Selectors without a style definition will be ignored with a warning.
 
-#### Types of Selectors 
+#### Types of Selectors
 
 **Basic: `style('foo')`**
 
@@ -148,7 +152,7 @@ Apply just the specified class by name.
 
 **Hierarchy: `style('foo.bar.baz')`**
 
-Apply an entire hierarchy of classes at once.  The above is equivalent to `style={[styles.foo, styles.foo.bar, styles.foo.bar.baz]}`.  
+Apply an entire hierarchy of classes at once.  The above is equivalent to `style={[styles.foo, styles.foo.bar, styles.foo.bar.baz]}`.
 
 **Conditional: `style('foo bar? baz?', toggle)`**
 
@@ -176,12 +180,12 @@ class MyView extends Component {
         <Text {...style('header.secondary')}>
 	      Primary and Secondary Heading
         </Text>
-        <Text {...style('error?incomplete', { 
-	      incomplete: true 
+        <Text {...style('error?incomplete', {
+	      incomplete: true
         })}>
 	      Styled via 'error' if incomplete
         </Text>
-        <Text {...style('header', [{ 
+        <Text {...style('header', [{
 	      color: 'red'
         }])}>
 	      Inline override. :(
@@ -238,8 +242,8 @@ This can be improved upon by extracting out the common bits into their own class
 }
 ....
 <View style={[
-  styles.pageContainer, 
-  styles.pageContainerWithHeader, 
+  styles.pageContainer,
+  styles.pageContainerWithHeader,
   styles.pageContainerWithFooter ]}>
   Body Text
 </View>
