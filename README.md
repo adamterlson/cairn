@@ -2,7 +2,7 @@
 # Cairn
 Cairn is a tiny library for React Native that replaces the default `styles={[styles.foo, styles.bar]}` styling sytnax with a simpler, string-based spread syntax: `{...style('foo bar')}`.  Cairn supports defining multiple classes, applying hierarchically-defined classes en masse, and conditional classes.
 
-Instead of trying to shim a CSS preprocessor, Cairn embraces the power ([and advantages](https://facebook.github.io/react-native/docs/style.html)) of JavaScript-based styling.
+Instead of trying to shim a CSS preprocessor, Cairn embraces the power ([and advantages](https://facebook.github.io/react-native/docs/style.html)) of JavaScript-based styling.  Cairn plays well with [React StyleSheet](https://facebook.github.io/react-native/docs/stylesheet.html).
 
 If you're not sure why you want this, check out the [Background](#background) section.
 
@@ -18,21 +18,31 @@ npm install --save cairn
 ```
 let cairn = requrie('cairn');
 let style = cairn({
-	first: {
-    	backgroundColor: 'red',
+    first: {
+      backgroundColor: 'red',
 
-        child: {
-        	backgroundColor: 'blue'
-        }
+      child: {
+        backgroundColor: 'blue'
+      }
     },
     second: {
-        height: 10,
-        width: 10
+      height: 100,
+      width: 100
+    },
+    someImage: {
+      props: {
+        source: require('../someImage.png')
+      },
+      width: 100,
+      height: 50
     }
 });
 ...
-<!-- Will be blue and 10x10  -->
+<!-- Will be blue and 100x100  -->
 <View {...style('first.child second')} />
+
+<!-- Will have source prop of someImage.png and 100x50 -->
+<Image {...style('someImage') />
 ```
 
 
@@ -40,7 +50,7 @@ let style = cairn({
 Passing your stylesheets first through Cairn has two major advantages over using React Native's styling directly:
 
 #### 1) Nested Objects
-Using a nested object sets up a parent-child relationship for en-masse style application (see API/examples).
+Using a nested object sets up a parent-child relationship for en-masse style application (see API/examples).  Child styles and props extend (and override) those of their parent(s).
 
 #### 2) Custom Props
 Use the keyword `props` to define presentation attributes besides `styles`. Child props take precedence, just like styles.
@@ -77,9 +87,16 @@ export default cairn({
       h2: { fontSize: 20 }
     },
 
-	button: {
-		textAlign: 'center'
-	}
+    button: {
+      textAlign: 'center'
+    }
+  },
+  logo: {
+  	props: {
+  	  source: require('../images/logo.png')
+  	},
+  	width: 100,
+  	height: 40
   },
   button: {
     props: {
@@ -103,17 +120,20 @@ For more information the different types of selectors Cairn supports (Basic, Hie
 
 ```javascript
 // MyComponent.js
-import React from 'react-native';
+import React, { View, Text, TouchableHighlight, Image } from 'react-native';
 import style from './styles.js';
 
 class MyComponent extends React.Component {
   render() {
     return (
       <View>
-        <!-- text, header, header.h1, header.h1.user -->
+      	<!-- logo -->
+      	<Image {...style('logo')} />
+      	
+        <!-- text, text.header, text.header.h1, text.header.h1.user -->
         <Text {...style('text.header.h1.user')}>Primary User Header Text</Text>
 
-        <!-- text, header, header.h2 -->
+        <!-- text, text.header, text.header.h2 -->
         <Text {...style('text.header.h2')}>Secondary Header Text</Text>
 
         <!-- button, button.user -->
@@ -133,8 +153,7 @@ class MyComponent extends React.Component {
 
 ### `let style = cairn(stylesheet [, styleTransform])`
 
-Pass to `cairn` your stylesheet.  This **returns a new function** which is used to apply the styles to specific elements.  This is essentially equivalent to
-`cairn.style(cairn.pile(stylesheet))`.
+Pass to `cairn` your stylesheet.  This **returns a new function** which is used to apply the styles to specific elements.
 
 **Parameters**
 * `stylesheet` - Object - The stylesheet of application styles.
@@ -255,6 +274,6 @@ This is better, there's less redundancy in the styles, but the length of the cla
 
 2) Reference this child type directly and get all the parent styling for free without having to compose it manually
 
-Additionally, some components define presentation attributes outside of `styles`, for example TouchableHighlight's `underlayColor`.  In order to reference colors defined and used elsewhere in your stylesheet on these components, your file must additionally export colors.  This is an inconvenience, so it'd be nice if our solution to the above included the ability to merge the definition of presentation with its application.
+Additionally, some components define presentation attributes outside of `styles`, for example TouchableHighlight's `underlayColor`.  In order to reference colors defined and used elsewhere in your stylesheet on these components, you must export colors in addition to your stylesheet.  This is an inconvenience, ideally we'd want the definition of presentation in one place, regardless of what attribute on our component is being set.
 
 Cairn does all of this!
