@@ -480,26 +480,34 @@ describe('cairn', function () {
                         bar: {
                             props: {
                                 prop: 'value'
-                            }
-                        }
+                            },
+                            height: 10
+                        },
+
+                        height: 15
                     },
                     bar: {
                         props: {
                             prop: 'value'
-                        }
+                        },
+                        height: 20
                     }
                 }).extend({
                     foo: {
                         bar: {
                             props: {
                                 newprop: 'extendedvalue'
-                            }
-                        }
+                            },
+                            width: 10
+                        },
+
+                        width: 15
                     },
                     bar: {
                         props: {
                             prop: 'newvalue'
-                        }
+                        },
+                        width: 20
                     }
                 });
             });
@@ -511,6 +519,11 @@ describe('cairn', function () {
             it('should extend props from the extended sheet onto the base', function () {
                 expect(style('foo.bar').prop).to.eql('value');
                 expect(style('foo.bar').newprop).to.eql('extendedvalue');
+            });
+
+            it('should extned style attributes', function () {
+                expect(style('bar').style).to.eql([{ height: 20 }, { width: 20 }]);
+                expect(style('foo.bar').style).to.eql([{ height: 15 }, { height: 10 }, { width: 15 }, { width: 10 }]);
             });
         });
 
