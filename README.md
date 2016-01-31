@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/adamterlson/cairn.svg?branch=master)](https://travis-ci.org/adamterlson/cairn)
 # Cairn
-Cairn is a tiny library for React Native that replaces the default `styles={[styles.foo, styles.bar]}` styling sytnax with a simpler, string-based spread syntax: `{...style('foo bar')}`.  Cairn supports defining multiple classes, applying hierarchically-defined classes en masse, and conditional classes.
+Cairn is a tiny library for React Native that replaces the default `styles={[styles.foo, styles.bar]}` styling sytnax with a simpler, string-based spread syntax: `{...style('foo bar')}`.  Cairn supports defining multiple classes, applying hierarchically-defined classes en masse, and conditional classes.  Cairn also supports module-specific styles, extended from the global ones.
 
 Instead of trying to shim a CSS preprocessor, Cairn embraces the power ([and advantages](https://facebook.github.io/react-native/docs/style.html)) of JavaScript-based styling.  Cairn plays well with [React StyleSheet](https://facebook.github.io/react-native/docs/stylesheet.html).
 
@@ -15,19 +15,19 @@ npm install --save cairn
 
 ## Basic Usage
 
+Define your global component styles that are reusable across your entire application centrally.
 ```
-let cairn = requrie('cairn');
-let style = cairn({
+// styles.js
+
+import cairn from 'cairn';
+
+export default cairn({
     first: {
       backgroundColor: 'red',
 
       child: {
         backgroundColor: 'blue'
       }
-    },
-    second: {
-      height: 100,
-      width: 100
     },
     someImage: {
       props: {
@@ -37,12 +37,34 @@ let style = cairn({
       height: 50
     }
 });
-...
-<!-- Will be blue and 100x100  -->
-<View {...style('first.child second')} />
+```
 
-<!-- Will have source prop of someImage.png and 100x50 -->
-<Image {...style('someImage') />
+Then, import those global styles and (optionally) extend/override them with component-specific styles before spreading them onto your components.
+```
+// MyComponent.js
+
+import React from 'react-native';
+import globalStyles from './styles';
+
+const style = globalStyles.extend({
+    second: {
+      height: 100,
+      width: 100
+    },
+    'first.child': {
+        backgroundColor: 'purple'
+    }
+});
+
+export default () => (
+    <View>
+        <!-- Will be purple and 100x100  -->
+        <View {...style('first.child second')} />
+
+        <!-- Will have source prop of someImage.png and 100x50 -->
+        <Image {...style('someImage') />
+    </View>
+);
 ```
 
 
@@ -57,7 +79,7 @@ Use the keyword `props` to define presentation attributes besides `styles`. Chil
 
 > There are many React Native components that use properties other than `styles` for presentation (e.g.  `TouchableHighlight`'s underlayColor).  You can define these presentation-related attributes in your stylesheet by using `props`.
 
-### Stylesheet Definition
+### Global Stylesheet Definition
 To create your stylesheet, pass an object containing your styles to `cairn` and an optional second parameter containing a style transformer.
 
 ```javascript
@@ -74,29 +96,15 @@ export default cairn({
 
     header: {
       fontFamily: 'Georgia',
-      textDecorationLine: 'underline',
-
-      h1: {
-        fontSize: 30,
-
-        user: {
-          color: 'red'
-        }
-      },
-
-      h2: { fontSize: 20 }
-    },
-
-    button: {
-      textAlign: 'center'
+      textDecorationLine: 'underline'
     }
   },
   logo: {
-  	props: {
-  	  source: require('../images/logo.png')
-  	},
-  	width: 100,
-  	height: 40
+    props: {
+      source: require('../images/logo.png')
+    },
+    width: 100,
+    height: 40
   },
   button: {
     props: {
@@ -112,6 +120,25 @@ export default cairn({
   }
 }, (styles) => StyleSheet.create(styles));
 ```
+### Component-specific Stylesheet Definition
+
+An `extend` function is available on the result of calling `cairn` and is used to create module specific styles.  One module's styles are not accessible from another, and **no modifications are made to the global styles**.  When a style transformer is defined on the global stylesheet being extended, that same transformer is used for each extension.
+
+```
+import { StyleSheet } from 'react-native';
+import cairn from 'cairn';
+
+// Global styles
+const globalStyles = cairn({ ... }, (styles) => StyleSheet.create(styles));
+
+// MyParentModule
+const parentModuleStyles = globalStyles.extend({ ... });
+
+// MyChildModule
+const childModuleStyles = parentModuleStyles.extend({ ... });
+```
+
+> Note: Styles and props on an extension have precedence over those of the parent.
 
 ### Cairn Selectors
 Apply your styles in a simple, yet powerful way using strings instead of arrays of object references.
@@ -121,24 +148,41 @@ For more information the different types of selectors Cairn supports (Basic, Hie
 ```javascript
 // MyComponent.js
 import React, { View, Text, TouchableHighlight, Image } from 'react-native';
-import style from './styles.js';
+import globalStyle from './styles.js';
+
+const style = globalStyle.extend({
+  container: {
+    flex: 1
+  },
+  text: {
+    fontSize: 20,
+
+    header: {
+      fontSize: 50
+    },
+    button: {
+      textAlign: 'center'
+    }
+  }
+});
 
 class MyComponent extends React.Component {
   render() {
     return (
-      <View>
-      	<!-- logo -->
-      	<Image {...style('logo')} />
-      	
-        <!-- text, text.header, text.header.h1, text.header.h1.user -->
-        <Text {...style('text.header.h1.user')}>Primary User Header Text</Text>
+      <!-- component.container -->
+      <View {...style('container')}>
+        <!-- global.logo -->
+        <Image {...style('logo')} />
 
-        <!-- text, text.header, text.header.h2 -->
-        <Text {...style('text.header.h2')}>Secondary Header Text</Text>
+        <!-- global.text, global.text.header, component.text, component.header -->
+        <Text {...style('text.header')}>Header Text</Text>
 
-        <!-- button, button.user -->
+        <!-- global.text, component.text -->
+        <Text {...style('text')}>Module-specific Text</Text>
+
+        <!-- global.button, global.button.user -->
         <TouchableHighlight {...style('button.user')} onPress={() => {}}>
-          <!-- text, text.button -->
+          <!-- global.text, component.text, component.text.button -->
           <Text {...style('text.button')}>Button Text</Text>
         </TouchableHighlight>
       </View>
@@ -159,7 +203,14 @@ Pass to `cairn` your stylesheet.  This **returns a new function** which is used 
 * `stylesheet` - Object - The stylesheet of application styles.
 * `styleTransform` - Function - Optional - Called with flattened styles with props removed.  Expected return: the styles to be used.  This is a hook for calling `StyleSheet.create`.
 
-### `style(selectors)`
+### `let moduleStyle = style.extend(moduleStylesheet)`
+
+Create a new style function with access to the module-specific stylesheet.  The returned selector function has access to the extended stylesheet in addition to the global.  Does not modify global styles.  Uses global `styleTransform` function if defined.  **Returns function used precisely the same as `cairn` itself.**
+
+**Parameters**
+* `moduleStylesheet` - Object - The stylesheet of module styles.
+
+### `style(selectors)` and `moduleStyle(selectors)`
 
 Apply styles by passing a space-delimited string to `style`  (the function returned from `cairn`) and then spread the result onto a component.  Selected styles are appended in order with last item having precedence. Selectors without a style definition will be ignored with a warning.
 
@@ -192,22 +243,22 @@ Sometimes necessary, inline styles can be appended via an array of inline styles
 class MyView extends Component {
   render() {
     return (
-	  <View>
+      <View>
         <Text {...style('header')}>
-	      Primary Heading
+          Primary Heading
         </Text>
         <Text {...style('header.secondary')}>
-	      Primary and Secondary Heading
+          Primary and Secondary Heading
         </Text>
         <Text {...style('error?incomplete', {
-	      incomplete: true
+          incomplete: true
         })}>
-	      Styled via 'error' if incomplete
+          Styled via 'error' if incomplete
         </Text>
         <Text {...style('header', [{
-	      color: 'red'
+          color: 'red'
         }])}>
-	      Inline override. :(
+          Inline override. :(
         </Text>
       </View>
     );
