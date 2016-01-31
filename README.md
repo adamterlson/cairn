@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/adamterlson/cairn.svg?branch=master)](https://travis-ci.org/adamterlson/cairn)
 # Cairn
-Cairn is a tiny library for React Native that replaces the default `styles={[styles.foo, styles.bar]}` styling sytnax with a simpler, string-based spread syntax: `{...style('foo bar')}`.  Cairn supports defining multiple classes, applying hierarchically-defined classes en masse, and conditional classes.  Cairn also supports module-specific styles, extended from the global ones.
+Cairn is a tiny library for React Native that replaces the default `styles={[styles.foo, styles.bar]}` styling sytnax with a simpler, string-based spread syntax: `{...style('foo bar')}`.  Cairn supports defining multiple classes, applying hierarchically-defined classes en masse, and conditional classes.  Cairn also supports module-specific styles, extended from the global ones.  Check out the Examples folder for further guidance on usage.
 
 Instead of trying to shim a CSS preprocessor, Cairn embraces the power ([and advantages](https://facebook.github.io/react-native/docs/style.html)) of JavaScript-based styling.  Cairn plays well with [React StyleSheet](https://facebook.github.io/react-native/docs/stylesheet.html).
 
