@@ -79,6 +79,9 @@ Use the keyword `props` to define presentation attributes besides `styles`. Chil
 
 > There are many React Native components that use properties other than `styles` for presentation (e.g.  `TouchableHighlight`'s underlayColor).  You can define these presentation-related attributes in your stylesheet by using `props`.
 
+#### 3) Global + Module-specific Styling
+Create global, reusable styles and `extend` them within your component with the styles specific to that context.
+
 ### Global Stylesheet Definition
 To create your stylesheet, pass an object containing your styles to `cairn` and an optional second parameter containing a style transformer.
 
