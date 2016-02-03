@@ -69,18 +69,19 @@ export default () => (
 
 
 ## Cairn Stylesheets
-Passing your stylesheets first through Cairn has two major advantages over using React Native's styling directly:
+Using Cairn has three major advantages over just using React Native's styling directly:
 
 #### 1) Nested Objects
 Using a nested object sets up a parent-child relationship for en-masse style application (see API/examples).  Child styles and props extend (and override) those of their parent(s).
 
-#### 2) Custom Props
+#### 2) Global + Module-specific Styles
+Create global, reusable styles and `extend` them within your component with the styles specific to that context.
+
+#### 3) Custom Props
 Use the keyword `props` to define presentation attributes besides `styles`. Child props take precedence, just like styles.
 
 > There are many React Native components that use properties other than `styles` for presentation (e.g.  `TouchableHighlight`'s underlayColor).  You can define these presentation-related attributes in your stylesheet by using `props`.
 
-#### 3) Global + Module-specific Styling
-Create global, reusable styles and `extend` them within your component with the styles specific to that context.
 
 ### Global Stylesheet Definition
 To create your stylesheet, pass an object containing your styles to `cairn` and an optional second parameter containing a style transformer.
