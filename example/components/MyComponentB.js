@@ -43,7 +43,7 @@ export default class MyComponentB {
                     <Text>Item 2</Text>
                 </View>
                 <View {...style('listItem.withUser')}>
-                    <Text {...style('fred?', activeUser.name === fred)}>{this.state.activeUser.name}</Text>
+                    <Text {...style('fred?', activeUser.name === 'fred')}>{this.state.activeUser.name}</Text>
                 </View>
             </View>
         </View>
