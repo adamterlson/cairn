@@ -56,7 +56,7 @@ export default cairn({
 
 ...then, import those global styles and (optionally) extend/override them with component-specific styles before spreading them onto the components.
 
-```javascript
+```jsx
 // components/MyComponent.js
 
 import React from 'react-native';
