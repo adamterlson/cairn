@@ -2,7 +2,7 @@
 
 # Cairn
 
-Enhanced styling in React Native that replaces the default `styles={[styles.foo, styles.bar]}` styling sytnax with a simpler yet more powerful string-based spread syntax: `{...style('foo bar')}`.
+Enhanced styling method for React Native that replaces the default `styles={[styles.foo, styles.bar]}` sytnax with a simpler, yet more powerful, string-based spread syntax: `{...style('foo bar')}`.
 
 Instead of trying to shim a CSS preprocessor, Cairn embraces the power ([and advantages](https://facebook.github.io/react-native/docs/style.html)) of JavaScript-based styling. 
 
