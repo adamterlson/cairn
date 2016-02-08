@@ -1,7 +1,5 @@
-import React, { View, TouchableHighlight } from 'react-native';
+import React, { View, Text, TouchableHighlight } from 'react-native';
 import globalStyle from '../style';
-
-// Grab the global styles, and extend them with styles that you will only use in the specific component
 
 const style = globalStyle.extend({
     container: {
@@ -30,7 +28,7 @@ export default class MyComponentB {
     constructor(props) {
         super(props);
 
-        this.setState({ activeUser: { name: 'fred' } })
+        this.setState({ activeUser: { name: 'fred', isAdmin: true } })
     }
 
     render() {
@@ -44,6 +42,7 @@ export default class MyComponentB {
                 </View>
                 <View {...style('listItem.withUser')}>
                     <Text {...style('fred?', activeUser.name === 'fred')}>{this.state.activeUser.name}</Text>
+                    <Text {...style('admin?isAdmin', activeUser)}>{ activeUser.isAdmin ? 'admin' : 'not admin' }</Text>
                 </View>
             </View>
         </View>

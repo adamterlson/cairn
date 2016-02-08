@@ -1,18 +1,42 @@
-import React, { View, TouchableHighlight } from 'react-native';
-import globalStyle from '../style';
-
-// Grab the global styles, and extend them with styles that you will only use in the specific component
+import React, { View, Text, TouchableHighlight, Image } from 'react-native';
+import globalStyle from '../style.js';
 
 const style = globalStyle.extend({
-    container: {
-        backgroundColor: 'red'
+  container: {
+    flex: 1
+  },
+  text: {
+    fontSize: 20,
+
+    header: {
+      fontSize: 50
+    },
+    button: {
+      textAlign: 'center'
     }
+  }
 });
 
-export default () => (
-    <View {...style('container')}>
-        <TouchableHighlight {...style('button.danger')}>
-            <Text {...style('text.button')}>Fire the missiles!</Text>
+class MyComponent extends React.Component {
+  render() {
+    return (
+      <!-- component.container -->
+      <View {...style('container')}>
+        <!-- global.logo -->
+        <Image {...style('logo')} />
+
+        <!-- global.text, global.text.header, component.text, component.header -->
+        <Text {...style('text.header')}>Header Text</Text>
+
+        <!-- global.text, component.text -->
+        <Text {...style('text')}>Module-specific Text</Text>
+
+        <!-- global.button, global.button.user -->
+        <TouchableHighlight {...style('button.user')} onPress={() => {}}>
+          <!-- global.text, component.text, component.text.button -->
+          <Text {...style('text.button')}>Button Text</Text>
         </TouchableHighlight>
-    </View>
-);
+      </View>
+    );
+  }
+}

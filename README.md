@@ -1,12 +1,25 @@
 [![Build Status](https://travis-ci.org/adamterlson/cairn.svg?branch=master)](https://travis-ci.org/adamterlson/cairn)
+
 # Cairn
-Cairn is a tiny library for React Native that replaces the default `styles={[styles.foo, styles.bar]}` styling sytnax with a simpler, string-based spread syntax: `{...style('foo bar')}`.  Cairn supports defining multiple classes, applying hierarchically-defined classes en masse, and conditional classes.  Cairn also supports module-specific styles, extended from the global ones.  Check out the Examples folder for further guidance on usage.
 
-Instead of trying to shim a CSS preprocessor, Cairn embraces the power ([and advantages](https://facebook.github.io/react-native/docs/style.html)) of JavaScript-based styling.  Cairn plays well with [React StyleSheet](https://facebook.github.io/react-native/docs/stylesheet.html).
+Enhanced styling in React Native that replaces the default `styles={[styles.foo, styles.bar]}` styling sytnax with a simpler yet more powerful string-based spread syntax: `{...style('foo bar')}`.
 
-If you're not sure why you want this, check out the [Background](#background) section.
+Instead of trying to shim a CSS preprocessor, Cairn embraces the power ([and advantages](https://facebook.github.io/react-native/docs/style.html)) of JavaScript-based styling. 
 
-Cairn has no dependencies.
+Cairn plays well with [React StyleSheet](https://facebook.github.io/react-native/docs/stylesheet.html).
+
+Dependencies: None
+
+## Advantages
+
+1. **Component-specific stylesheets** - Create and apply styles right in your component which extend from a shared, global stylesheet.
+2. **Parent-child entity relationships** - Get "specificity" in React Native by overriding parent entity types with child types which derive from them.
+3. **Apply style hierarchies en-masse** - Using strings instead of arrays of object references, refer to the aforementioned child entities and get all the parent styles as well.
+4. **Conditional selectors** - Conditionally apply specific styles using a `?` flag and a toogle boolean or hash of toggle values.
+5. **Set arbitrary style-related component props** - (e.g. `underlayColor` and `source`) Use the `props` keyword in your stylesheet to set any component prop!
+
+See [Background](#background) section for more details on why you should use Cairn.
+
 
 ## Install
 ```
@@ -15,10 +28,12 @@ npm install --save cairn
 
 ## Basic Usage
 
-Define your global component styles that are reusable across your entire application centrally.
+Define your global component styles that are reusable across your entire application...
+
 ```
 // styles.js
 
+import { StyleSheet } from 'react-native';
 import cairn from 'cairn';
 
 export default cairn({
@@ -36,15 +51,16 @@ export default cairn({
       width: 100,
       height: 50
     }
-});
+}, (styles) => StyleSheet.create(styles));
 ```
 
-Then, import those global styles and (optionally) extend/override them with component-specific styles before spreading them onto your components.
+...then, import those global styles and (optionally) extend/override them with component-specific styles before spreading them onto the components.
+
 ```
-// MyComponent.js
+// components/MyComponent.js
 
 import React from 'react-native';
-import globalStyles from './styles';
+import globalStyles from '../styles';
 
 const style = globalStyles.extend({
     second: {
@@ -58,146 +74,36 @@ const style = globalStyles.extend({
 
 export default () => (
     <View>
-        <!-- Will be purple and 100x100  -->
+        <!-- Equal to:
+            <View
+                style={[ 
+                    globalStyles.first, 
+                    globalStyles.first.child, 
+                    style.first,
+                    style.first.child,
+                    style.second
+                ]}  
+            />
+        -->
         <View {...style('first.child second')} />
 
-        <!-- Will have source prop of someImage.png and 100x50 -->
+        <!-- Equal to:
+            <Image
+                style={[ 
+                    globalStyles.someImage
+                ]}
+                source={require('../someImage.png')}
+            />
+        -->
         <Image {...style('someImage') />
     </View>
 );
 ```
 
-
-## Cairn Stylesheets
-Using Cairn has three major advantages over just using React Native's styling directly:
-
-#### 1) Nested Objects
-Using a nested object sets up a parent-child relationship for en-masse style application (see API/examples).  Child styles and props extend (and override) those of their parent(s).
-
-#### 2) Global + Module-specific Styles
-Create global, reusable styles and `extend` them within your component with the styles specific to that context.
-
-#### 3) Custom Props
-Use the keyword `props` to define presentation attributes besides `styles`. Child props take precedence, just like styles.
-
-> There are many React Native components that use properties other than `styles` for presentation (e.g.  `TouchableHighlight`'s underlayColor).  You can define these presentation-related attributes in your stylesheet by using `props`.
+See the Examples folder for more usage help.
 
 
-### Global Stylesheet Definition
-To create your stylesheet, pass an object containing your styles to `cairn` and an optional second parameter containing a style transformer.
-
-```javascript
-// styles.js
-import { StyleSheet } from 'react-native';
-import cairn from 'cairn';
-
-const colors = { blue: 'blue', gray: 'gray', red: 'red' };
-
-export default cairn({
-  text: {
-    fontFamily: 'Cochin',
-    color: colors.gray,
-
-    header: {
-      fontFamily: 'Georgia',
-      textDecorationLine: 'underline'
-    }
-  },
-  logo: {
-    props: {
-      source: require('../images/logo.png')
-    },
-    width: 100,
-    height: 40
-  },
-  button: {
-    props: {
-      underlayColor: colors.gray
-    },
-    backgroundColor: colors.blue,
-
-    user: {
-      props: {
-        underlayColor: colors.red
-      }
-    }
-  }
-}, (styles) => StyleSheet.create(styles));
-```
-### Component-specific Stylesheet Definition
-
-An `extend` function is available on the result of calling `cairn` and is used to create module specific styles.  One module's styles are not accessible from another, and **no modifications are made to the global styles**.  When a style transformer is defined on the global stylesheet being extended, that same transformer is used for each extension.
-
-```
-import { StyleSheet } from 'react-native';
-import cairn from 'cairn';
-
-// Global styles
-const globalStyles = cairn({ ... }, (styles) => StyleSheet.create(styles));
-
-// MyParentModule
-const parentModuleStyles = globalStyles.extend({ ... });
-
-// MyChildModule
-const childModuleStyles = parentModuleStyles.extend({ ... });
-```
-
-> Note: Styles and props on an extension have precedence over those of the parent.
-
-### Cairn Selectors
-Apply your styles in a simple, yet powerful way using strings instead of arrays of object references.
-
-For more information the different types of selectors Cairn supports (Basic, Hierarchical, and Conditional) see the [API section](#styleselectors) below.
-
-```javascript
-// MyComponent.js
-import React, { View, Text, TouchableHighlight, Image } from 'react-native';
-import globalStyle from './styles.js';
-
-const style = globalStyle.extend({
-  container: {
-    flex: 1
-  },
-  text: {
-    fontSize: 20,
-
-    header: {
-      fontSize: 50
-    },
-    button: {
-      textAlign: 'center'
-    }
-  }
-});
-
-class MyComponent extends React.Component {
-  render() {
-    return (
-      <!-- component.container -->
-      <View {...style('container')}>
-        <!-- global.logo -->
-        <Image {...style('logo')} />
-
-        <!-- global.text, global.text.header, component.text, component.header -->
-        <Text {...style('text.header')}>Header Text</Text>
-
-        <!-- global.text, component.text -->
-        <Text {...style('text')}>Module-specific Text</Text>
-
-        <!-- global.button, global.button.user -->
-        <TouchableHighlight {...style('button.user')} onPress={() => {}}>
-          <!-- global.text, component.text, component.text.button -->
-          <Text {...style('text.button')}>Button Text</Text>
-        </TouchableHighlight>
-      </View>
-    );
-  }
-}
-```
-> `style` returns an object containing all the properties it will set on the component, so if you do not wish to use the spread syntax, you can access and apply `styles` and other directly:
-> `<TouchableHighlight styles={style('foo').styles} underlayColor={styles('foo').underlayColor} />`.
-
-## API
+# API
 
 ### `let style = cairn(stylesheet [, styleTransform])`
 
@@ -205,18 +111,38 @@ Pass to `cairn` your stylesheet.  This **returns a new function** which is used 
 
 **Parameters**
 * `stylesheet` - Object - The stylesheet of application styles.
-* `styleTransform` - Function - Optional - Called with flattened styles with props removed.  Expected return: the styles to be used.  This is a hook for calling `StyleSheet.create`.
+* `styleTransform` - Function - Optional - Called with flattened styles with props removed.  Expected return: the styles to be used.
+
+> The style transformer is the way to pass every stylesheet given to Cairn (and subsequently extend) also to React's `StyleSheet.create`.  The stylesheet given to `cairn` is first flattened and the props removed before being passed to to the styles transformer.
 
 ### `let moduleStyle = style.extend(moduleStylesheet)`
 
-Create a new style function with access to the module-specific stylesheet.  The returned selector function has access to the extended stylesheet in addition to the global.  Does not modify global styles.  Uses global `styleTransform` function if defined.  **Returns function used precisely the same as `cairn` itself.**
+Create a new style function with access to the module-specific stylesheet.  The returned selector function has access to the extended stylesheet in addition to the global.  **No modifications are made to the global styles**. Uses the global `styleTransform` function if defined.  **Returns function used precisely the same as `cairn` itself.**
 
 **Parameters**
 * `moduleStylesheet` - Object - The stylesheet of module styles.
 
-### `style(selectors)` and `moduleStyle(selectors)`
+```
+import { StyleSheet } from 'react-native';
+import cairn from 'cairn';
+
+// styles.js
+const globalStyles = cairn({ ... }, (styles) => StyleSheet.create(styles));
+
+// MyParentModule.js
+const parentModuleStyles = globalStyles.extend({ ... });
+
+// MyChildModule.js
+const childModuleStyles = parentModuleStyles.extend({ ... });
+```
+>Usage of `parentModuleStyles` and `childModuleStyles` is precisely the same as `globalStyles`.  See `style(selectors)` below.
+
+### `style(selectors)`
 
 Apply styles by passing a space-delimited string to `style`  (the function returned from `cairn`) and then spread the result onto a component.  Selected styles are appended in order with last item having precedence. Selectors without a style definition will be ignored with a warning.
+
+> `style` returns an object containing all the properties it will set on the component, so if you do not wish to use the spread syntax, you can access and apply `styles` and other props directly:
+> `<TouchableHighlight styles={style('foo').styles} underlayColor={styles('bar').underlayColor} />`.
 
 #### Types of Selectors
 
@@ -233,6 +159,9 @@ Apply an entire hierarchy of classes at once.  The above is equivalent to `style
 Conditionally apply a style based on the state of toggle.  If toggle is a boolean, the boolean's value will be used.  If an object is given, the corresponding key in the object will be used instead.  Map the class to a new property by defining the mapped key after the `?` operator: `foo?newName`.
 
 ```
+<Text {...style('p complete? error?', false)}>...</Text>
+
+// or:
 <Text {...style('p complete?name error?', { name: 'Bob', error: 'Too Short!' })}>...</Text>
 ```
 
@@ -254,6 +183,9 @@ class MyView extends Component {
         <Text {...style('header.secondary')}>
           Primary and Secondary Heading
         </Text>
+        <Text {...style('error?', false)}>
+           Never styled via 'error'
+        </Text>
         <Text {...style('error?incomplete', {
           incomplete: true
         })}>
@@ -271,6 +203,11 @@ class MyView extends Component {
 ```
 
 ## Background
+
+Styling in React Native is a mixed blessing.  On one hand you have the power of JS-driven styling which is superior in many ways.  There are some issues with it however:
+
+### Composing styles with arrays
+
 In React Native, there is no cascading of styles, so when you have multiple types of something, say a pageContainer, most will begin by styling each individually:
 
 ```javascript
@@ -327,8 +264,30 @@ This is better, there's less redundancy in the styles, but the length of the cla
 
 1) Be able to separate our stylesheet out into a set of parent types and child types that extend their parents, and
 
-2) Reference this child type directly and get all the parent styling for free without having to compose it manually
+2) Reference this child type directly and get all the parent styling for free without having to compose it manually.
 
-Additionally, some components define presentation attributes outside of `styles`, for example TouchableHighlight's `underlayColor`.  In order to reference colors defined and used elsewhere in your stylesheet on these components, you must export colors in addition to your stylesheet.  This is an inconvenience, ideally we'd want the definition of presentation in one place, regardless of what attribute on our component is being set.
 
-Cairn does all of this!
+### Module-specific styles
+
+In React Native, there is no support for a module-specific stylesheet.  Or no support for a global stylesheet.  You choose how to look at it.  It's possible to define two separate stylesheets and then, when applying styles to your component, select which stylesheet you wish to draw styles from or compose your styles array from both:
+
+`<View styles={[ global.foo, componentSpecific.bar ]} />`
+
+Or you could export just the JS object globally and extend it in your component when you call `StyleSheet.create`.
+
+However, if you were to create such a system, there's no way to functionally extend/override styles, you simply need to apply them in order every time.  Take this to a third level and you see how unmanageable such a setup becomes.
+
+Ideally we'd have a way to set default styles then simply extend them with modifiers and addtions specific to the module we're working on.
+
+
+### Style-related props that cannot be set via `style=`
+
+Some components in React Native define presentation attributes that cannot be set with the `styles` attribute, for example TouchableHighlight's `underlayColor`.  
+
+In this example, in order to reference colors centralized in your stylesheet and then use them elsewhere on these components, you must export colors in addition to your stylesheet.  
+
+Ideally we want the definition of styles in one place, regardless of what property on our component is being set.
+
+...
+
+Cairn addresses all of these issues!

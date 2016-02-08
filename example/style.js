@@ -1,25 +1,40 @@
+
 import { StyleSheet } from 'react-native';
 import cairn from 'cairn';
 
-// Define your global, reusable styles, optionally passing in a transformer to create a stylesheet
+const colors = {
+    blue: 'blue',
+    gray: 'gray',
+    red: 'red'
+};
 
 export default cairn({
-    container: {
-        flex: 1
-    },
-    text: {
-        header: {
-            fontSize: 30
-        },
-        button: {
-            textAlign: 'center'
-        }
-    },
-    button: {
-        props: {
-            underlayColor: 'blue'
-        },
+  text: {
+    fontFamily: 'Cochin',
+    color: colors.gray,
 
-        borderRadius: 10
+    header: {
+      fontFamily: 'Georgia',
+      textDecorationLine: 'underline'
     }
+  },
+  logo: {
+    props: {
+      source: require('../images/logo.png')
+    },
+    width: 100,
+    height: 40
+  },
+  button: {
+    props: {
+      underlayColor: colors.gray
+    },
+    backgroundColor: colors.blue,
+
+    user: {
+      props: {
+        underlayColor: colors.red
+      }
+    }
+  }
 }, (styles) => StyleSheet.create(styles));
