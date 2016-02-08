@@ -1,6 +1,7 @@
-[![Build Status](https://travis-ci.org/adamterlson/cairn.svg?branch=master)](https://travis-ci.org/adamterlson/cairn)
-
 # Cairn
+
+[![Build Status](https://travis-ci.org/adamterlson/cairn.svg?branch=master)](https://travis-ci.org/adamterlson/cairn)
+[![npm version](https://badge.fury.io/js/cairn.svg)](https://badge.fury.io/js/cairn)
 
 Enhanced styling method for React Native that replaces the default `style={[styles.foo, styles.bar]}` sytnax with a simpler, yet more powerful, string-based spread syntax: `{...style('foo bar')}`.
 
