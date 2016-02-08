@@ -30,7 +30,7 @@ npm install --save cairn
 
 Define your global component styles that are reusable across your entire application...
 
-```
+```javascript
 // styles.js
 
 import { StyleSheet } from 'react-native';
@@ -56,7 +56,7 @@ export default cairn({
 
 ...then, import those global styles and (optionally) extend/override them with component-specific styles before spreading them onto the components.
 
-```
+```javascript
 // components/MyComponent.js
 
 import React from 'react-native';
@@ -122,7 +122,7 @@ Create a new style function with access to the module-specific stylesheet.  The 
 **Parameters**
 * `moduleStylesheet` - Object - The stylesheet of module styles.
 
-```
+```javascript
 import { StyleSheet } from 'react-native';
 import cairn from 'cairn';
 
@@ -158,7 +158,7 @@ Apply an entire hierarchy of classes at once.  The above is equivalent to `style
 
 Conditionally apply a style based on the state of toggle.  If toggle is a boolean, the boolean's value will be used.  If an object is given, the corresponding key in the object will be used instead.  Map the class to a new property by defining the mapped key after the `?` operator: `foo?newName`.
 
-```
+```jsx
 <Text {...style('p complete? error?', false)}>...</Text>
 
 // or:
