@@ -74,7 +74,7 @@ const style = globalStyles.extend({
 
 export default () => (
     <View>
-        <!-- Equal to:
+        /* Equal to:
             <View
                 style={[ 
                     globalStyles.first, 
@@ -84,17 +84,17 @@ export default () => (
                     style.second
                 ]}  
             />
-        -->
+        */
         <View {...style('first.child second')} />
 
-        <!-- Equal to:
+        /* Equal to:
             <Image
                 style={[ 
                     globalStyles.someImage
                 ]}
                 source={require('../someImage.png')}
             />
-        -->
+        */
         <Image {...style('someImage') />
     </View>
 );
