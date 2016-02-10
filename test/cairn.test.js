@@ -125,6 +125,10 @@ describe('cairn', function () {
                 expect(style('thingOne thingTwo? thingTwo? parent?', false)).to.eql({ style: [thingOne] });
             });
 
+            it('should toggle true for string values', function () {
+              expect(style('thingOne thingTwo?', 'string')).to.eql({ style: [thingOne, thingTwo] });
+            });
+
             describe('selector hash', function () {
                 it('should use the class name as a default key in the toggle hash', function () {
                     expect(style('thingOne?', { thingOne: false })).to.eql({ style: [] });
