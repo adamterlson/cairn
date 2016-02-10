@@ -63,7 +63,7 @@ describe('cairn', function () {
         });
 
         describe('warning', function () {
-            it('should not warn if the sytle is defined', function () {
+            it('should not warn if the style is defined', function () {
                 let warnings = 0;
                 console.warn = () => warnings++;
 
@@ -81,7 +81,7 @@ describe('cairn', function () {
                 expect(warnings).to.eql(0);
             });
 
-            it('should warn if the sytle is not defined', function () {
+            it('should warn if the style is not defined', function () {
                 let warnings = 0;
                 console.warn = () => warnings++;
 
@@ -459,6 +459,7 @@ describe('cairn', function () {
                 thingTwo: extendedThingTwo,
                 parent: extendedParent,
                 'parent.child': extendedChild,
+                unique: { thing: 'thing' }
             });
         });
 
@@ -471,6 +472,44 @@ describe('cairn', function () {
 
         it('should apply extended styles after, even if specific selector is missing', function () {
             expect(extended('parent.child.grandchild')).to.eql({ style: [parent, child, grandchild, extendedParent, extendedChild] });
+        });
+
+        describe('warning', function () {
+            it('should not warn if the style is defined on the extension', function () {
+                let warnings = 0;
+                console.warn = () => warnings++;
+
+                extended('unique');
+
+                expect(warnings).to.eql(0);
+            });
+
+            it('should not warn if the style is defined on the base', function () {
+                let warnings = 0;
+                console.warn = () => warnings++;
+
+                extended('propsOnly');
+
+                expect(warnings).to.eql(0);
+            });
+
+            it('should warn if the style is not defined', function () {
+                let warnings = 0;
+                console.warn = () => warnings++;
+
+                extended('bad');
+
+                expect(warnings).to.eql(1);
+            });
+
+            it('should warn only once for the deepest call of extended', function () {
+                let warnings = 0;
+                console.warn = () => warnings++;
+
+                extended('thingOne.one.two.three.four');
+
+                expect(warnings).to.eql(1);
+            });
         });
 
         describe('with props', function () {
