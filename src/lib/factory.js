@@ -4,7 +4,7 @@ import pile from './pile';
 function noopStyler() { return { style: [] }; }
 function noopTransformer(prop) { return prop }
 
-function cairn(parentStyler, sheet = {}, stylesTransformer, propsTransformer) {
+function factory(parentStyler, sheet = {}, stylesTransformer, propsTransformer) {
   // Check for null or undefined and set to a noop
   if (stylesTransformer == null) {
     stylesTransformer = noopTransformer;
@@ -28,7 +28,7 @@ function cairn(parentStyler, sheet = {}, stylesTransformer, propsTransformer) {
   const combinedStyler = mergedStyle(parentStyler, currentStyler);
 
   // Add the extend function for chaining
-  combinedStyler.extend = (sheet) => cairn(combinedStyler, sheet, stylesTransformer, propsTransformer);
+  combinedStyler.extend = (sheet) => factory(combinedStyler, sheet, stylesTransformer, propsTransformer);
 
   return combinedStyler;
 };
@@ -46,4 +46,4 @@ function mergedStyle(...stylers) {
   }
 }
 
-export default cairn.bind(null, noopStyler);
+export default factory.bind(null, noopStyler);
