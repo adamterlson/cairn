@@ -103,17 +103,7 @@ export default () => (
 
 See the Examples folder for more usage help.
 
-## Style & Prop Transformers ("Middleware")
-
-Cairn provides a chance to attach abitrary transformational "middleware" for your styles and props.
-
-See [Creating Custom Transformers](#creating-custom-transformers).
-
-### Provided
-
-- `cairn.combineTransformers([...transformers])` - Pass all transformers to be used and they will be called with the result of the former transformations in the order given.
-
-# `cairn` API
+# API
 
 ### `let style = cairn(stylesheet [, styleTransform, propTransform])`
 
@@ -211,6 +201,14 @@ class MyView extends Component {
   }
 }
 ```
+
+## Style & Prop Transformers ("Middleware")
+
+Cairn provides a chance to attach abitrary transformational "middleware" for your styles and props.
+
+See [Creating Custom Transformers](#creating-custom-transformers).
+
+- `cairn.combineTransformers([...transformers])` - Pass all transformers to be used and they will be called with the result of the former transformations in the order given.
 
 ## Creating Custom Transformers
 
