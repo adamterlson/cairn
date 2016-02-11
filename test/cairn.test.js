@@ -452,7 +452,7 @@ describe('cairn', function () {
             });
         });
     });
-
+/*
     describe('mergedStyle', function() {
         it('should merge together props and styles', function () {
             let styler1 = function () {
@@ -478,7 +478,7 @@ describe('cairn', function () {
                 style: ['A', 'B', 'C', 'D']
             });
         });
-    });
+    });*/
 
     describe('extend', function () {
         let extended,
