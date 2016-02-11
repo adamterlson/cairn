@@ -3,11 +3,11 @@
 [![Build Status](https://travis-ci.org/adamterlson/cairn.svg?branch=master)](https://travis-ci.org/adamterlson/cairn)
 [![npm version](https://badge.fury.io/js/cairn.svg)](https://badge.fury.io/js/cairn)
 
-Enhanced styling method for React Native that replaces the default `style={[styles.foo, styles.bar]}` sytnax with a simpler, yet more powerful, string-based spread syntax: `{...style('foo bar')}`.
+Enhanced styling for React Native that replaces the default `style={[styles.foo, styles.bar]}` sytnax with a simpler, yet more powerful, string-based spread syntax: `{...style('foo bar')}`.
 
 Instead of trying to shim a CSS preprocessor, Cairn embraces the power ([and advantages](https://facebook.github.io/react-native/docs/style.html)) of JavaScript-based styling. 
 
-Cairn plays well with [React StyleSheet](https://facebook.github.io/react-native/docs/stylesheet.html).
+Cairn plays well with [React StyleSheet](https://facebook.github.io/react-native/docs/stylesheet.html). See [Middleware](#style-prop-transformers-middleware)
 
 Dependencies: None
 
@@ -103,18 +103,74 @@ export default () => (
 
 See the Examples folder for more usage help.
 
+## Style & Prop Transformers ("Middleware")
+
+Cairn provides a chance to attach abitrary transformational "middleware" for your styles and props.  
+
+In order for Cairn to work unobtrusively with React's `StyleSheet.create` (and even some other enhanced-styling-features-related-libraries), special (see: "non-obvious") steps must be taken regarding the behavior/usage of transformers:
+
+1. **All nested objects must be flattened.** For example, `{ foo: { bar: { height: 10 } } }` becomes `{ 'foo.bar': { height: 10 } }`.  This is the format of style definition supported by React's `StyleSheet.create` and other libraries which lack nested object support.
+2. **Separate out props from styles.**  Because `props` has special meaning in Cairn, these values must be isolated from the styles before being transformed.  The format of selectors and their associated props looks identical to that of styles.  That is, flattened, as shown above.
+3. **Transform props and styles independently.**  Some transformers may be shared (for example one which adds variable support), while others are specific to either styles *or* props (e.g. `React.StyleSheet` only works for styles).  Therefore, they must be transformed independently.
+
+> Every `extend`ed stylesheet is also sent through the root context's style and prop transformers.
+
+### `transformer(stylesOrProps)`
+
+The format the styles and props take when being passed to the transformer is different than the structure passed to `cairn` itself.
+
+```javascript
+const styleTransformer = styles => {
+  // styles ==> {
+  //  'parent': {
+  //    someParentStyle: 'value'
+  //  },
+  //  'parent.child': {
+  //    someChildStyle: 'value'
+  //  }
+  // }
+  return styles;
+};
+const propTransformer = props => {
+  // props ==> {
+  //  'parent': {
+  //    someParentProp: 'value'
+  //  },
+  //  'parent.child': {
+  //    someChildProp: 'value'
+  //  }
+  // }
+  return styles;
+};
+const styles = cairn({ 
+  parent: {
+    props: {
+      someChildProp: 5
+    },
+    someParentStyle: 'value',
+
+    child: {
+      props: {
+        someChildProp: 10
+      }
+      someChildStyle: 'value'
+    }
+  }
+}, styleTransformer, propTransformer);
+```
+
+The returned value from a transformer is what is actually made available to subsequent selector calls via `style` and ultimate applied to your components.
 
 # API
 
-### `let style = cairn(stylesheet [, styleTransform])`
+### `let style = cairn(stylesheet [, styleTransform, propTransform])`
 
 Pass to `cairn` your stylesheet.  This **returns a new function** which is used to apply the styles to specific elements.
 
 **Parameters**
 * `stylesheet` - Object - The stylesheet of application styles.
 * `styleTransform` - Function - Optional - Called with flattened styles with props removed.  Expected return: the styles to be used.
-
-> The style transformer is the way to pass every stylesheet given to Cairn (and subsequently extend) also to React's `StyleSheet.create`.  The stylesheet given to `cairn` is first flattened and the props removed before being passed to to the styles transformer.
+* `propTransform` - Function - Optional - Called with flattened props with styles removed.  Expected return: the props to be used.
 
 ### `let moduleStyle = style.extend(moduleStylesheet)`
 
@@ -136,7 +192,8 @@ const parentModuleStyles = globalStyles.extend({ ... });
 // MyChildModule.js
 const childModuleStyles = parentModuleStyles.extend({ ... });
 ```
->Usage of `parentModuleStyles` and `childModuleStyles` is precisely the same as `globalStyles`.  See `style(selectors)` below.
+
+>Usage of `parentModuleStyles` and `childModuleStyles` is precisely the same as `globalStyles`.  See [`style(selectors)`](#style-selectors) below.
 
 ### `style(selectors)`
 
