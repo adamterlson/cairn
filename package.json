@@ -4,7 +4,7 @@
   "description": "Simpler string-based styling for React Native",
   "main": "dest/index.js",
   "scripts": {
-    "compile": "babel -d dest/ lib/",
+    "compile": "babel -d dest/ src/",
     "prepublish": "npm run compile",
     "test": "./node_modules/mocha/bin/mocha"
   },

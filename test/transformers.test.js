@@ -1,6 +1,6 @@
 'use strict';
 
-import { combineTransformers } from '../lib';
+import { combineTransformers } from '../src';
 
 const expect = require('chai').expect;
 
