@@ -105,63 +105,15 @@ See the Examples folder for more usage help.
 
 ## Style & Prop Transformers ("Middleware")
 
-Cairn provides a chance to attach abitrary transformational "middleware" for your styles and props.  
+Cairn provides a chance to attach abitrary transformational "middleware" for your styles and props.
 
-In order for Cairn to work unobtrusively with React's `StyleSheet.create` (and even some other enhanced-styling-features-related-libraries), special (see: "non-obvious") steps must be taken regarding the behavior/usage of transformers:
+See [Creating Custom Transformers](#creating-custom-transformers).
 
-1. **All nested objects must be flattened.** For example, `{ foo: { bar: { height: 10 } } }` becomes `{ 'foo.bar': { height: 10 } }`.  This is the format of style definition supported by React's `StyleSheet.create` and other libraries which lack nested object support.
-2. **Separate out props from styles.**  Because `props` has special meaning in Cairn, these values must be isolated from the styles before being transformed.  The format of selectors and their associated props looks identical to that of styles.  That is, flattened, as shown above.
-3. **Transform props and styles independently.**  Some transformers may be shared (for example one which adds variable support), while others are specific to either styles *or* props (e.g. `React.StyleSheet` only works for styles).  Therefore, they must be transformed independently.
+### Provided
 
-> Every `extend`ed stylesheet is also sent through the root context's style and prop transformers.
+- `cairn.combineTransformers([...transformers])` - Pass all transformers to be used and they will be called with the result of the former transformations in the order given.
 
-### `transformer(stylesOrProps)`
-
-The format the styles and props take when being passed to the transformer is different than the structure passed to `cairn` itself.
-
-```javascript
-const styleTransformer = styles => {
-  // styles ==> {
-  //  'parent': {
-  //    someParentStyle: 'value'
-  //  },
-  //  'parent.child': {
-  //    someChildStyle: 'value'
-  //  }
-  // }
-  return styles;
-};
-const propTransformer = props => {
-  // props ==> {
-  //  'parent': {
-  //    someParentProp: 'value'
-  //  },
-  //  'parent.child': {
-  //    someChildProp: 'value'
-  //  }
-  // }
-  return styles;
-};
-const styles = cairn({ 
-  parent: {
-    props: {
-      someChildProp: 5
-    },
-    someParentStyle: 'value',
-
-    child: {
-      props: {
-        someChildProp: 10
-      }
-      someChildStyle: 'value'
-    }
-  }
-}, styleTransformer, propTransformer);
-```
-
-The returned value from a transformer is what is actually made available to subsequent selector calls via `style` and ultimate applied to your components.
-
-# API
+# `cairn` API
 
 ### `let style = cairn(stylesheet [, styleTransform, propTransform])`
 
@@ -259,6 +211,64 @@ class MyView extends Component {
   }
 }
 ```
+
+## Creating Custom Transformers
+
+In order for Cairn to work unobtrusively with React's `StyleSheet.create` (and even some other enhanced-styling-features-related-libraries), special (see: "non-obvious") steps must be taken regarding the behavior of transformers:
+
+1. **All nested objects must be flattened.** For example, `{ foo: { bar: { height: 10 } } }` becomes `{ 'foo.bar': { height: 10 } }`.  This is the format of style definition supported by React's `StyleSheet.create` and other libraries which lack nested object support.
+2. **Separate out props from styles.**  Because `props` has special meaning in Cairn, these values must be isolated from the styles before being transformed.  The format of selectors and their associated props looks identical to that of styles.  That is, flattened, as shown above.
+3. **Transform props and styles independently.**  Some transformers may be shared (for example one which adds variable support), while others are specific to either styles *or* props (e.g. `React.StyleSheet` only works for styles).  Therefore, they must be transformed independently.
+
+> Every `extend`ed stylesheet is also sent through the root context's style and prop transformers.
+
+### `transformer(stylesOrProps)`
+
+The format the styles and props take when being passed to the transformer is different than the structure passed to `cairn` itself.
+
+```javascript
+const styleTransformer = styles => {
+  // styles ==> {
+  //  'parent': {
+  //    someParentStyle: 'value'
+  //  },
+  //  'parent.child': {
+  //    someChildStyle: 'value'
+  //  }
+  // }
+  return styles;
+};
+const propTransformer = props => {
+  // props ==> {
+  //  'parent': {
+  //    someParentProp: 'value'
+  //  },
+  //  'parent.child': {
+  //    someChildProp: 'value'
+  //  }
+  // }
+  return styles;
+};
+const styles = cairn({ 
+  parent: {
+    props: {
+      someChildProp: 5
+    },
+    someParentStyle: 'value',
+
+    child: {
+      props: {
+        someChildProp: 10
+      }
+      someChildStyle: 'value'
+    }
+  }
+}, styleTransformer, propTransformer);
+```
+
+> The passed in props and styles objects should not themselves be modified.
+
+The returned value from a transformer is what is actually made available to subsequent selector calls via `style` and ultimate applied to your components.
 
 ## Background
 
