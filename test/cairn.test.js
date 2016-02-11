@@ -78,6 +78,17 @@ describe('cairn', function () {
                 expect(style('c.d')).to.eql({ e: 'e', style: [] });
             });
         });
+
+        describe('styles and props transformer', function () {
+            it('should transform all the things', function () {
+                let stylesTransformer = styles => ({ c: { d: 'd' } });
+                let propsTransformer = props => ({ c: { f: 'f' } });
+
+                let style = cairn({}, stylesTransformer, propsTransformer);
+
+                expect(style('c')).to.eql({ style: [{d:'d'}], f: 'f' })
+            });
+        });
     });
 
     describe('style', function () {
@@ -558,16 +569,22 @@ describe('cairn', function () {
             });
         });
 
-        describe('with transformer', function () {
-            it('should call the transformer once for every extend', function () {
-                let calls = [];
-                let base = { base: { prop: 'base' } };
-                let extend1 = { extend1: { prop: 'extend1' } };
-                let extend2 = { extend2: { prop: 'extend2' } };
+        describe('with transformers', function () {
+            it('should call the transformers once for every extend', function () {
+                let styleCalls = [];
+                let propCalls = [];
 
-                style = cairn(base, (styles) => calls.push(styles)).extend(extend1).extend(extend2);
+                let base = { base: { baseBar: 'baseBar', props: { baseFoo: 'baseFoo' } } };
+                let extend1 = { extend1: { extend1Bar: 'extend1Bar', props: { extend1Foo: 'extend1Foo' } } };
+                let extend2 = { extend2: { extend2Bar: 'extend2Bar', props: { extend2Foo: 'extend2Foo' } } };
 
-                expect(calls).to.eql([base, extend1, extend2]);
+                let stylesTransformer = (styles) => styleCalls.push(styles);
+                let propsTransformer = (props) => propCalls.push(props);
+
+                style = cairn(base, stylesTransformer, propsTransformer).extend(extend1).extend(extend2);
+
+                expect(styleCalls).to.eql([{base:{baseBar:'baseBar'}}, {extend1:{extend1Bar:'extend1Bar'}}, {extend2:{extend2Bar:'extend2Bar'}}]);
+                expect(propCalls).to.eql([{base:{baseFoo:'baseFoo'}}, {extend1:{extend1Foo:'extend1Foo'}}, {extend2:{extend2Foo:'extend2Foo'}}]);
             });
         });
     });
