@@ -1,6 +1,6 @@
 'use strict';
 
-import cairn, { mergedStyle, pile, style as styleSelectorFactory } from '../lib';
+import cairn, { mergedStyle, pile } from '../lib';
 
 var expect = require('chai').expect;
 
