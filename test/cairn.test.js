@@ -46,10 +46,37 @@ describe('cairn', function () {
             expect(cairn(nested)('parent.child')).to.eql({ style: [{ attr: 10 }] });
         });
 
-        it('should transform styles', function () {
-            let style = cairn({}, () => { return { 'c.d': 'e' } });
+        describe('styles transformer', function () {
+            it('should not transform if argument is null', function () {
+                let style = cairn({ a: { b: 'b' } }, null);
 
-            expect(style('c.d')).to.eql({ style: ['e'] });
+                expect(style('a')).to.eql({ style: [{ b:'b' }] });
+            });
+            it('should transform styles', function () {
+                let style = cairn({ a: { b: 'b' } }, (styles) => { 
+                    expect(styles).to.eql({ a: { b: 'b' } });
+                    return { 'c.d': 'e' };
+                });
+
+                expect(style('c.d')).to.eql({ style: ['e'] });
+            });
+        });
+
+        describe('props transformer', function () {
+            it('should not transform if argument is null', function () {
+                let style = cairn({ a: { props: { b: 'b' } } }, null, null);
+
+                expect(style('a')).to.eql({ style: [], b: 'b' });
+            });
+
+            it('should transform props', function () {
+                let style = cairn({ a: { props: { b: 'b' }}}, null, (props) => { 
+                    expect(props).to.eql({ a: { b: 'b' } });
+                    return { 'c.d': { e: 'e' } };
+                });
+
+                expect(style('c.d')).to.eql({ e: 'e', style: [] });
+            });
         });
     });
 
