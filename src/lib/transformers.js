@@ -1,4 +1,4 @@
-export function combineTransformers(...transformers) {
+export function compose(...transformers) {
   if (!transformers || !transformers.length) {
     throw new Error('No transformers provided');
   }
