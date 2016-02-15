@@ -208,7 +208,7 @@ Cairn provides a chance to attach abitrary transformational "middleware" for you
 
 See [Creating Custom Transformers](#creating-custom-transformers).
 
-- `cairn.combineTransformers([...transformers])` - Pass all transformers to be used and they will be called with the result of the former transformations in the order given.
+- `cairn.compose([...transformers])` - Pass all transformers to be used and they will be called with the result of the former transformations in the order given.
 
 ## Creating Custom Transformers
 
@@ -245,7 +245,7 @@ const propTransformer = props => {
   //    someChildProp: 'value'
   //  }
   // }
-  return styles;
+  return props;
 };
 const styles = cairn({ 
   parent: {

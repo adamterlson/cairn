@@ -1,6 +1,6 @@
 'use strict';
 
-import { combineTransformers } from '../src';
+import { compose } from '../src';
 
 const expect = require('chai').expect;
 
@@ -23,9 +23,9 @@ describe('cairn transformers', function () {
     return obj;
   }, {});
 
-  describe('combineTransformers', function () {
+  describe('compose', function () {
     it('should return the sum of all transformations', function () {
-      expect(combineTransformers(prepender, nester)(startingPoint)).to.eql({
+      expect(compose(prepender, nester)(startingPoint)).to.eql({
         nested: {
           prependparent: 'parent',
           prependchild: {
@@ -36,7 +36,7 @@ describe('cairn transformers', function () {
     });
 
     it('should throw if no transformers are given', function () {
-      expect(() => combineTransformers()).to.throw('No transformers provided');
+      expect(() => compose()).to.throw('No transformers provided');
     });
   })
 });
