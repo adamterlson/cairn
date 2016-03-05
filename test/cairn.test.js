@@ -414,33 +414,6 @@ describe('cairn', function () {
             });
         });
     });
-/*
-    describe('mergedStyle', function() {
-        it('should merge together props and styles', function () {
-            let styler1 = function () {
-                return {
-                    propA: 'A',
-                    propB: 'B',
-                    style: ['A', 'B']
-                };
-            };
-            let styler2 = function () {
-                return {
-                    propA: 'A2',
-                    propC: 'C2',
-                    style: ['C', 'D']
-                };
-            };
-
-            let mergedStylesAndProps = mergedStyle(styler1, styler2)('selector');
-            expect(mergedStylesAndProps).to.eql({
-                propA: 'A2',
-                propB: 'B',
-                propC: 'C2',
-                style: ['A', 'B', 'C', 'D']
-            });
-        });
-    });*/
 
     describe('extend', function () {
         let extended,
