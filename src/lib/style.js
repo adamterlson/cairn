@@ -13,12 +13,7 @@ export default function style(sheet) {
         selector = conditionalSelector(selector, toggle);
 
         if (!selector) return arr;
-
-        // Check if selector is invalid
-        if (!sheet.styles[selector] && !sheet.props[selector]) {
-          console.warn('Missing style and prop definition for: ', selector);
-        }
-
+        
         // Expand out dot notation syntax
         arr = arr.concat(dotExpander(selector));
 

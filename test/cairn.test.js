@@ -2,7 +2,7 @@
 
 import cairn, { mergedStyle, pile } from '../src';
 
-var expect = require('chai').expect;
+const expect = require('chai').expect;
 
 describe('cairn', function () {
     let style,
@@ -98,44 +98,6 @@ describe('cairn', function () {
 
         it('should select the appropriate as an array for space delimited selectors', function () {
             expect(style('thingOne thingTwo')).to.eql({ style: [thingOne, thingTwo] });
-        });
-
-        describe('warning', function () {
-            it('should not warn if the sytle is defined', function () {
-                let warnings = 0;
-                console.warn = () => warnings++;
-
-                style('thingOne');
-
-                expect(warnings).to.eql(0);
-            });
-
-            it('should not warn if there are defined props', function () {
-                let warnings = 0;
-                console.warn = () => warnings++;
-
-                style('propsOnly');
-
-                expect(warnings).to.eql(0);
-            });
-
-            it('should warn if the sytle is not defined', function () {
-                let warnings = 0;
-                console.warn = () => warnings++;
-
-                style('bad');
-
-                expect(warnings).to.eql(1);
-            });
-
-            it('should warn only once for the deepest call of style', function () {
-                let warnings = 0;
-                console.warn = () => warnings++;
-
-                style('thingOne.one.two.three.four');
-
-                expect(warnings).to.eql(1);
-            });
         });
 
         describe('optional selectors', function () {
