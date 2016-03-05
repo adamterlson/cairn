@@ -103,6 +103,43 @@ export default () => (
 
 See the Examples folder for more usage help.
 
+## Style & Prop Transformers ("Middleware")
+
+Cairn provides a chance to attach abitrary transformational "middleware" for your styles and props.  These are also used for every call to `extend`.
+
+The following are transformers included with Cairn.  See [Creating Custom Transformers](#creating-custom-transformers).
+
+- `compose(...transformers)` - Pass all transformers to be used and they will be called with the result of the former transformations in the order given.
+
+- `variables({ foo: 10, bar: {} })` - Pass a list of variables which can be referenced in your sheet, e.g. `{ one: '$foo', two: '$bar' }`.  The variable values are used by ref in place of the variable string, e.g. `{ one: 10, two: {} }`.
+
+```javascript
+  import cairn, { compose, variables } from 'cairn';
+
+  const vars = variables({ foo: 10, bar: 20 });
+
+  cairn(
+    {
+      thing: {
+        props: {
+          bar: '$bar'
+        },
+
+        foo: '$foo'
+      }
+    }, 
+
+    // Style transformers
+    compose(
+      vars, 
+      (styles) => StyleSheet.create(styles)
+    ),
+
+    // Prop transformers
+    vars
+  );
+```
+
 # API
 
 ### `let style = cairn(stylesheet [, styleTransform, propTransform])`
@@ -202,27 +239,11 @@ class MyView extends Component {
 }
 ```
 
-## Style & Prop Transformers ("Middleware")
-
-Cairn provides a chance to attach abitrary transformational "middleware" for your styles and props.
-
-See [Creating Custom Transformers](#creating-custom-transformers).
-
-- `cairn.compose([...transformers])` - Pass all transformers to be used and they will be called with the result of the former transformations in the order given.
-
 ## Creating Custom Transformers
 
-In order for Cairn to work unobtrusively with React's `StyleSheet.create` (and even some other enhanced-styling-features-related-libraries), special (see: "non-obvious") steps must be taken regarding the behavior of transformers:
-
-1. **All nested objects must be flattened.** For example, `{ foo: { bar: { height: 10 } } }` becomes `{ 'foo.bar': { height: 10 } }`.  This is the format of style definition supported by React's `StyleSheet.create` and other libraries which lack nested object support.
-2. **Separate out props from styles.**  Because `props` has special meaning in Cairn, these values must be isolated from the styles before being transformed.  The format of selectors and their associated props looks identical to that of styles.  That is, flattened, as shown above.
-3. **Transform props and styles independently.**  Some transformers may be shared (for example one which adds variable support), while others are specific to either styles *or* props (e.g. `React.StyleSheet` only works for styles).  Therefore, they must be transformed independently.
-
-> Every `extend`ed stylesheet is also sent through the root context's style and prop transformers.
+In order for Cairn to work unobtrusively with React's `StyleSheet.create` (and even some other enhanced-styling-features-related-libraries), all props must be separated from styles, flattened, and transformed separately.
 
 ### `transformer(stylesOrProps)`
-
-The format the styles and props take when being passed to the transformer is different than the structure passed to `cairn` itself.
 
 ```javascript
 const styleTransformer = styles => {
@@ -266,7 +287,8 @@ const styles = cairn({
 
 > The passed in props and styles objects should not themselves be modified.
 
-The returned value from a transformer is what is actually made available to subsequent selector calls via `style` and ultimate applied to your components.
+The returned value from a transformer is what is actually made available to subsequent selector calls via `style` and ultimately applied to your components.
+
 
 ## Background
 
