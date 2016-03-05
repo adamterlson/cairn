@@ -14,10 +14,11 @@ Dependencies: None
 ## Advantages
 
 1. **Component-specific stylesheets** - Create and apply styles right in your component which extend from a shared, global stylesheet.
-2. **Parent-child entity relationships** - Get "specificity" in React Native by overriding parent entity types with child types which derive from them.
-3. **Apply style hierarchies en-masse** - Using strings instead of arrays of object references, refer to the aforementioned child entities and get all the parent styles as well.
-4. **Conditional selectors** - Conditionally apply specific styles using a `?` flag and a toogle boolean or hash of toggle values.
-5. **Set arbitrary style-related component props** - (e.g. `underlayColor` and `source`) Use the `props` keyword in your stylesheet to set any component prop!
+2. **"Middleware"** - Add support for variables, call React's `StyleSheet.create` and more in an unobtrusive way.  Write your own!
+3. **Parent-child entity relationships** - Get "specificity" in React Native by overriding parent entity types with child types which derive from them.
+4. **Apply style hierarchies en-masse** - Using strings instead of arrays of object references, refer to the aforementioned child entities and get all the parent styles as well.
+5. **Conditional selectors** - Conditionally apply specific styles using a `?` flag and a toogle boolean or hash of toggle values.
+6. **Set arbitrary style-related component props** - (e.g. `underlayColor` and `source`) Use the `props` keyword in your stylesheet to set any component prop!
 
 See [Background](#background) section for more details on why you should use Cairn.
 
