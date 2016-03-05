@@ -15,9 +15,9 @@ export function compose(...transformers) {
     throw new Error('No transformers provided');
   }
 
-  return (sheet) => 
+  return (sheet) =>
     transformers.reduce(
-      (result, transformer) => transformer(result), 
+      (result, transformer) => transformer(result),
       sheet
     );
 };
