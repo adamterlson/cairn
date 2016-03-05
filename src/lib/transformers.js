@@ -78,17 +78,3 @@ export function variables(variables) {
     return styles;
   };
 }
-
-/**
- * Style function values are executed at pile time
- */
-export function functional(...args) {
-  return (sheet) => Object.keys(sheet).reduce((result, key) => {
-    if (typeof sheet[key] === 'function') {
-      result[key] = sheet[key](...args);
-    } else {
-      result[key] = sheet[key];
-    }
-    return result;
-  }, {});
-};

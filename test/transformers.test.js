@@ -50,19 +50,6 @@ describe('cairn transformers', function () {
     });
   });
 
-  describe('functional', function () {
-    const startingPoint = {
-      parent: 'parent',
-      child: (a, b) => ({
-        [a]: b
-      })
-    };
-
-    it('should replace the prop value with the return value of the function', function () {
-      expect(functional('a', 'b')(startingPoint)).to.eql({ parent: 'parent', child: { a: 'b' }})
-    });
-  });
-
   describe('variables', function () {
     it('should replace variables with values by ref when no other characters are present', function () {
       const jazz = { j: 'azz' };
