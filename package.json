@@ -1,10 +1,10 @@
 {
   "name": "cairn",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Simpler string-based styling for React Native",
-  "main": "cairn.js",
+  "main": "dest/index.js",
   "scripts": {
-    "compile": "babel src --out-file cairn.js",
+    "compile": "babel -d dest/ src/",
     "prepublish": "npm run compile",
     "test": "./node_modules/mocha/bin/mocha"
   },
