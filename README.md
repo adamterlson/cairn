@@ -179,8 +179,8 @@ const childModuleStyles = parentModuleStyles.extend({ ... });
 
 Apply styles by passing a space-delimited string to `style`  (the function returned from `cairn`) and then spread the result onto a component.  Selected styles are appended in order with last item having precedence. Selectors without a style definition will be ignored.
 
-> `style` returns an object containing all the properties it will set on the component, so if you do not wish to use the spread syntax, you can access and apply `styles` and other props directly:
-> `<TouchableHighlight styles={style('foo').styles} underlayColor={styles('bar').underlayColor} />`.
+> `style` returns an object containing all the properties it will set on the component, so if you do not wish to use the spread syntax, you can access and apply `style` and other props directly:
+> `<TouchableHighlight style={style('foo').style} underlayColor={style('bar').underlayColor} />`.
 
 #### Types of Selectors
 
