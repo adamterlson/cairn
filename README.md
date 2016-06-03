@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/adamterlson/cairn.svg?branch=master)](https://travis-ci.org/adamterlson/cairn)
 [![npm version](https://badge.fury.io/js/cairn.svg)](https://badge.fury.io/js/cairn)
 
-Enhanced styling for React Native that replaces the default `style={[styles.foo, styles.bar]}` sytnax with a simpler, yet more powerful, string-based spread syntax: `{...style('foo bar')}`.
+Enhanced styling for React Native that replaces the default `style={[styles.foo, styles.bar]}` sytnax with a simpler, yet more powerful, selector-based spread syntax: `{...style('foo bar')}`.
 
 Instead of trying to shim a CSS preprocessor, Cairn embraces the power ([and advantages](https://facebook.github.io/react-native/docs/style.html)) of JavaScript-based styling. 
 
