@@ -7,6 +7,8 @@ Improve the structure of your React Native stylesheets by creating shared, globa
 
 Easily apply your inherited stylesheet with a simpler, yet more powerful, selector-based, spread syntax: `{...style('foo bar')}` instead of with the wordy (and sometimes long) basic `style={[styles.foo, styles.bar]}` sytnax.
 
+You can even group all of your style-related attributes into one stylesheet, regardless of whether they're implemented via the `style` attribute or a separate one (e.g. `underlayColor` on [`TouchableHighlight`](https://facebook.github.io/react-native/docs/touchablehighlight.html)).
+
 Instead of trying to shim a CSS preprocessor, Cairn embraces the power ([and advantages](https://facebook.github.io/react-native/docs/style.html)) of JavaScript-based styling. 
 
 Cairn plays well with [React StyleSheet](https://facebook.github.io/react-native/docs/stylesheet.html). See [Middleware](#style-prop-transformers-middleware)
