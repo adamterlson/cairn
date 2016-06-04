@@ -3,7 +3,9 @@
 [![Build Status](https://travis-ci.org/adamterlson/cairn.svg?branch=master)](https://travis-ci.org/adamterlson/cairn)
 [![npm version](https://badge.fury.io/js/cairn.svg)](https://badge.fury.io/js/cairn)
 
-Enhanced styling for React Native that replaces the default `style={[styles.foo, styles.bar]}` sytnax with a simpler, yet more powerful, selector-based spread syntax: `{...style('foo bar')}`.
+Improve the structure of your React Native stylesheets with global styles and repeatedly extending directly from your components to create components styles that "inherit" from the shared, global ones.  Next, add the provided middleware to add variable support and send your stylesheet to React Stylesheet, or you can easily write your own.  
+
+Easily apply these styles not with the ugly (and sometimes rather long) `style={[styles.foo, styles.bar]}` sytnax and instead use a simpler, yet more powerful, selector-based, spread syntax: `{...style('foo bar')}`.
 
 Instead of trying to shim a CSS preprocessor, Cairn embraces the power ([and advantages](https://facebook.github.io/react-native/docs/style.html)) of JavaScript-based styling. 
 
