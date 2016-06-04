@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/adamterlson/cairn.svg?branch=master)](https://travis-ci.org/adamterlson/cairn)
 [![npm version](https://badge.fury.io/js/cairn.svg)](https://badge.fury.io/js/cairn)
 
-Improve the structure of your React Native stylesheets by creating shared, global styles and then extending & overriding them directly from your components.  Optionally add the provided middleware to get variable support from your entire app, or write your own style-transforming middleware.  
+Improve the structure of your React Native stylesheets by creating shared, global styles and then extending & overriding them directly from your components.  Optionally add the provided middleware to get variable support, or write your own style-transforming middleware.  
 
 Easily apply your inherited stylesheet with a simpler, yet more powerful, selector-based, spread syntax: `{...style('foo bar')}` instead of with the wordy (and sometimes long) basic `style={[styles.foo, styles.bar]}` sytnax.
 
