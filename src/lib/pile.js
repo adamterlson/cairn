@@ -31,7 +31,7 @@ export default function pile(prefix, sheet, flattened = {}, props = {}) {
 };
 
 // The property names which can be styled via an object in RN
-const STYLE_RESERVED_WORDS = ['shadowOffset', 'props'];
+const STYLE_RESERVED_WORDS = ['shadowOffset', 'textShadowOffset', 'props'];
 
 // Disallowed words in props definition
 const PROPS_RESERVED_WORDS = ['styles'];
