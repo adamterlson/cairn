@@ -1,6 +1,6 @@
 {
   "name": "cairn",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "description": "Simpler string-based styling for React Native",
   "main": "dest/index.js",
   "scripts": {
