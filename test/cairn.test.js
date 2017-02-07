@@ -285,7 +285,8 @@ describe('cairn', function () {
 
                     problemChild: {
                         transform: [{ scale: 1 }],
-                        shadowOffset: { height: 1, width: 0 }
+                        shadowOffset: { height: 1, width: 0 },
+                        textShadowOffset: { height: 0, width: 1 }
                     }
                 }
             };
@@ -315,7 +316,8 @@ describe('cairn', function () {
                     },
                     'foo.parent.problemChild': {
                         transform: [{ scale: 1 }],
-                        shadowOffset: { height: 1, width: 0 }
+                        shadowOffset: { height: 1, width: 0 },
+                        textShadowOffset: { height: 0, width: 1 }
                     }
                 }
             })
@@ -345,7 +347,8 @@ describe('cairn', function () {
                     },
                     'parent.problemChild': {
                         transform: [{ scale: 1 }],
-                        shadowOffset: { height: 1, width: 0 }
+                        shadowOffset: { height: 1, width: 0 },
+                        textShadowOffset: { height: 0, width: 1 }
                     }
                 }
             })
