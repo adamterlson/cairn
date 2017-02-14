@@ -501,9 +501,15 @@ describe('cairn', function () {
                 expect(style('foo.bar').newprop).to.eql('extendedvalue');
             });
 
-            it('should extned style attributes', function () {
+            it('should extend style attributes', function () {
                 expect(style('bar').style).to.eql([{ height: 20 }, { width: 20 }]);
                 expect(style('foo.bar').style).to.eql([{ height: 15 }, { height: 10 }, { width: 15 }, { width: 10 }]);
+            });
+
+            it('should append on the array of inline styles at the end', function () {
+                let inline1 = { color: 'red' };
+                let inline2 = { color: 'blue' };
+                expect(style('bar', [inline1, inline2]).style).to.eql([{ height: 20 }, { width: 20 }, inline1, inline2]);
             });
         });
 

@@ -1,10 +1,5 @@
 export default function style(sheet) {
-  return function styler(query, toggle, inline = []) {
-    if (Array.isArray(toggle)) {
-      inline = toggle;
-      toggle = null;
-    }
-
+  return function styler(query, toggle) {
     const missing = [];
     const parts = query.split(' ');
     const selectors = parts
@@ -38,8 +33,6 @@ export default function style(sheet) {
 
         return Object.assign(props, sheet.props[selector]);
       }, {});
-
-    style = [...style, ...inline];
 
     props.style = style;
 

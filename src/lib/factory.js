@@ -34,15 +34,24 @@ function factory(parentStyler, sheet = {}, stylesTransformer, propsTransformer) 
 };
 
 function mergedStyle(...stylers) {
-  return function (...args) {
-    return stylers.reduce((prevStylesAndProps, styler) => {
-      const currentStylesAndProps = styler(...args);
+  return function (query, toggle, inline = []) {
+    if (Array.isArray(toggle)) {
+      inline = toggle;
+      toggle = null;
+    }
+
+    const props = stylers.reduce((prevStylesAndProps, styler) => {
+      const currentStylesAndProps = styler(query, toggle);
       return {
         ...prevStylesAndProps,
         ...currentStylesAndProps,
         style: [ ...prevStylesAndProps.style, ...currentStylesAndProps.style ]
       };
     }, { style: [] });
+
+    props.style = [...props.style, ...inline];
+
+    return props;
   }
 }
 
