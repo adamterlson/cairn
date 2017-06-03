@@ -1,4 +1,4 @@
-import style from './style';
+import style, {cacheKey} from './style';
 import pile from './pile';
 
 function noopStyler() { return { style: [] }; }
@@ -34,13 +34,19 @@ function factory(parentStyler, sheet = {}, stylesTransformer, propsTransformer) 
 };
 
 function mergedStyle(...stylers) {
+  const cache = {};
   return function (query, toggle, inline = []) {
     if (Array.isArray(toggle)) {
       inline = toggle;
       toggle = null;
     }
 
-    const props = stylers.reduce((prevStylesAndProps, styler) => {
+    const key = cacheKey(query, toggle);
+    if (!inline.length && cache[key]) {
+      return cache[key];
+    }
+
+    const result = stylers.reduce((prevStylesAndProps, styler) => {
       const currentStylesAndProps = styler(query, toggle);
       return {
         ...prevStylesAndProps,
@@ -49,9 +55,13 @@ function mergedStyle(...stylers) {
       };
     }, { style: [] });
 
-    props.style = [...props.style, ...inline];
+    if (inline.length) {
+      result.style = [...result.style, ...inline];
+    } else {
+      cache[key] = result;
+    }
 
-    return props;
+    return result;
   }
 }
 

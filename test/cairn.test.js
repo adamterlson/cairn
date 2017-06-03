@@ -167,6 +167,16 @@ describe('cairn', function () {
             });
         });
 
+        describe('selector cache', function () {
+            it('should return the same array reference for the same simple selectors', function () {
+                expect(style('thingOne thingTwo').style).to.equal(style('thingOne thingTwo').style);
+            });
+
+            it('should return the same array reference for the same optional selector activations', function () {
+                expect(style('thingOne thingTwo? thingTwo? parent?', false).style).to.equal(style('thingOne thingTwo? thingTwo? parent?', false).style);
+            });
+        });
+
         describe('bad selectors', function () {
             it('should remove undefined selector result from array', function () {
                 expect(style('thingOne invalid thingTwo')).to.eql({ style: [thingOne, thingTwo] });

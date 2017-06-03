@@ -1,20 +1,7 @@
 export default function style(sheet) {
   return function styler(query, toggle) {
     const missing = [];
-    const parts = query.split(' ');
-    const selectors = parts
-      .reduce((arr, selector) => {
-        // Add conditional selector support
-        selector = conditionalSelector(selector, toggle);
-
-        if (!selector) return arr;
-        
-        // Expand out dot notation syntax
-        arr = arr.concat(dotExpander(selector));
-
-        return arr;
-      }, []);
-
+    const selectors = selectorsFor(query, toggle);
     // Compile styles
     let style = selectors
       .map(selector => {
@@ -39,6 +26,37 @@ export default function style(sheet) {
     return props;
   };
 };
+
+function selectorsFor(query, toggle) {
+  const parts = query.split(' ');
+  const selectors = parts
+    .reduce((arr, selector) => {
+      // Add conditional selector support
+      selector = conditionalSelector(selector, toggle);
+
+      if (!selector) return arr;
+
+      // Expand out dot notation syntax
+      arr = arr.concat(dotExpander(selector));
+
+      return arr;
+    }, []);
+
+  return selectors;
+}
+
+export function cacheKey(query, toggle, inline = []) {
+  if (Array.isArray(toggle)) {
+    inline = toggle;
+    toggle = null;
+  }
+
+  if (inline.length) {
+    return null;
+  }
+
+  return selectorsFor(query, toggle).join(' ');
+}
 
 // If the selector is conditional, return it based on toggle
 function conditionalSelector(selector, toggle) {
