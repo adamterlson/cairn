@@ -7,7 +7,7 @@ Improve the structure of your React Native stylesheets by creating shared, globa
 
 You can even group all of your style-related attributes into one stylesheet, regardless of whether they're applied via the `style` attribute or a separate one (e.g. `underlayColor` on [`TouchableHighlight`](https://facebook.github.io/react-native/docs/touchablehighlight.html)).
 
-These styles and props are applied with a simpler, yet more powerful, selector-based, spread syntax: `{...style('foo bar')}` instead of with the wordy (and sometimes super long) basic `style={[styles.foo, styles.bar]}` sytnax.
+These styles and props are applied with a simpler, yet more powerful, selector-based, spread syntax: `{...style('foo bar')}` instead of with the wordy (and sometimes super long) basic `style={[styles.foo, styles.bar]}` syntax.
 
 Instead of trying to shim a CSS preprocessor, Cairn embraces the power ([and advantages](https://facebook.github.io/react-native/docs/style.html)) of JavaScript-based styling. 
 
@@ -21,7 +21,7 @@ Dependencies: None
 2. **"Middleware"** - Add support for variables, call React's `StyleSheet.create` and more in an unobtrusive way.  Write your own!
 3. **Parent-child entity relationships** - Get "specificity" in React Native by overriding parent entity types with child types which derive from them.
 4. **Apply style hierarchies en-masse** - Using strings instead of arrays of object references, refer to the aforementioned child entities and get all the parent styles as well.
-5. **Conditional selectors** - Conditionally apply specific styles using a `?` flag and a toogle boolean or hash of toggle values.
+5. **Conditional selectors** - Conditionally apply specific styles using a `?` flag and a toggle boolean or hash of toggle values.
 6. **Set arbitrary style-related component props** - (e.g. `underlayColor` and `source`) Use the `props` keyword in your stylesheet to set any component prop!
 
 See [Background](#background) section for more details on why you should use Cairn.
@@ -110,7 +110,7 @@ See the Examples folder for more usage help.
 
 ## Style & Prop Transformers ("Middleware")
 
-Cairn provides a chance to attach abitrary transformational "middleware" for your styles and props.  These are also used for every call to `extend`.
+Cairn provides a chance to attach arbitrary transformational "middleware" for your styles and props.  These are also used for every call to `extend`.
 
 The following are transformers included with Cairn.  See [Creating Custom Transformers](#creating-custom-transformers).
 
@@ -370,7 +370,7 @@ Or you could export just the JS object globally and extend it in your component 
 
 However, if you were to create such a system, there's no way to functionally extend/override styles, you simply need to apply them in order every time.  Take this to a third level and you see how unmanageable such a setup becomes.
 
-Ideally we'd have a way to set default styles then simply extend them with modifiers and addtions specific to the module we're working on.
+Ideally we'd have a way to set default styles then simply extend them with modifiers and additions specific to the module we're working on.
 
 
 ### Style-related props that cannot be set via `style=`
